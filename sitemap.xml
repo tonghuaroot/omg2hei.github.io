@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://github.com/omg2hei/2019/05/28/Use-AWS-SSM-Systems-Manager-execute-remote-script-file-at-EC2-instance/</loc>
+    
+    <lastmod>2019-05-28T10:47:30.986Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://github.com/omg2hei/2019/05/23/AWS-VPC-DHCP-Options-Set-change-Effective-immediately/</loc>
     
     <lastmod>2019-05-23T15:00:17.818Z</lastmod>
