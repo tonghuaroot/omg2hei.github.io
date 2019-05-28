@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <title>TonghuaRoot&#39;s BloG.</title>
+  <title>TonghuaRoot&#39;s BloG. - Cyber security enthusiast, not hacker.</title>
   
   <subtitle>Know it, then Hack it!</subtitle>
   <link href="/atom.xml" rel="self"/>
@@ -108,6 +108,27 @@
     <updated>2019-05-21T17:24:57.352Z</updated>
     
     <content type="html"><![CDATA[<h2 id="Others"><a href="#Others" class="headerlink" title="Others"></a>Others</h2><p>The article was first published in:<a href="https://www.anquanke.com/post/id/163575" target="_blank" rel="noopener">https://www.anquanke.com/post/id/163575</a></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;Others&quot;&gt;&lt;a href=&quot;#Others&quot; class=&quot;headerlink&quot; title=&quot;Others&quot;&gt;&lt;/a&gt;Others&lt;/h2&gt;&lt;p&gt;The article was first published in:&lt;a href=&quot;https://ww
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Enterprise Cyber security build of Windows lateral movement attacks detection</title>
+    <link href="https://github.com/omg2hei/2018/03/02/Enterprise-Cyber-security-build-of-Windows-lateral-movement-attacks-detection/"/>
+    <id>https://github.com/omg2hei/2018/03/02/Enterprise-Cyber-security-build-of-Windows-lateral-movement-attacks-detection/</id>
+    <published>2018-03-02T03:01:18.000Z</published>
+    <updated>2019-05-28T11:02:03.230Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="Others"><a href="#Others" class="headerlink" title="Others"></a>Others</h2><p>The article was first published in:<a href="https://www.4hou.com/technology/10430.html" target="_blank" rel="noopener">https://www.4hou.com/technology/10430.html</a></p>]]></content>
     
     <summary type="html">
     
