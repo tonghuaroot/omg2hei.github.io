@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://tonghuaroot.com/2019/05/29/A-command-similar-to-wget-in-Windows-Invoke-WebRequest/</loc>
+    
+    <lastmod>2019-05-29T09:15:19.223Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://tonghuaroot.com/2017/12/25/Flask-debug-mode-PIN-code-generation-mechanism-security-research-notes/</loc>
     
     <lastmod>2019-05-29T09:09:55.676Z</lastmod>
@@ -26,13 +33,6 @@
     <loc>https://tonghuaroot.com/2019/05/28/Use-AWS-SSM-Systems-Manager-execute-remote-script-file-at-EC2-instance/</loc>
     
     <lastmod>2019-05-29T08:43:03.796Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://tonghuaroot.com/2019/05/29/A-command-similar-to-wget-in-Windows-Invoke-WebRequest/</loc>
-    
-    <lastmod>2019-05-29T08:40:44.640Z</lastmod>
     
   </url>
   

@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://tonghuaroot.com/"/>
-  <updated>2019-05-29T08:40:44.640Z</updated>
+  <updated>2019-05-29T09:15:19.223Z</updated>
   <id>https://tonghuaroot.com/</id>
   
   <author>
@@ -21,15 +21,15 @@
     <link href="https://tonghuaroot.com/2019/05/29/A-command-similar-to-wget-in-Windows-Invoke-WebRequest/"/>
     <id>https://tonghuaroot.com/2019/05/29/A-command-similar-to-wget-in-Windows-Invoke-WebRequest/</id>
     <published>2019-05-29T00:40:20.000Z</published>
-    <updated>2019-05-29T08:40:44.640Z</updated>
+    <updated>2019-05-29T09:15:19.223Z</updated>
     
-    <content type="html"><![CDATA[<h2 id="0x00-TL-DR"><a href="#0x00-TL-DR" class="headerlink" title="0x00 TL;DR"></a>0x00 TL;DR</h2><p>Linux can use <figure class="highlight plain"><figcaption><span>command to download files. In this article, we will introduce the powershell command for Windows download files: ```Invoke-WebRequest```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">## 0x01 Invoke-WebRequest Demo</span><br></pre></td></tr></table></figure></p><p>Invoke-WebRequest <a href="http://52.80.67.123:8000/get-process.ps1" target="_blank" rel="noopener">http://52.80.67.123:8000/get-process.ps1</a> -OutFile c:\get-process.ps1<br><code>`</code></p><h2 id="0x02-Reference"><a href="#0x02-Reference" class="headerlink" title="0x02 Reference"></a>0x02 Reference</h2><ul><li><a href="https://docs.microsoft.com/zh-cn/powershell/module/Microsoft.PowerShell.Utility/Invoke-WebRequest?view=powershell-5.1" target="_blank" rel="noopener">Invoke-WebRequest</a></li><li><a href="https://www.pstips.net/cat/powershell-%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B" target="_blank" rel="noopener">PowerShell Guide(Video)</a></li></ul>]]></content>
+    <content type="html"><![CDATA[<h2 id="0x00-TL-DR"><a href="#0x00-TL-DR" class="headerlink" title="0x00 TL;DR"></a>0x00 TL;DR</h2><p>Linux can use wget command to download files. In this article, we will introduce the powershell command for Windows download files: Invoke-WebRequesit.</p><h2 id="0x01-Invoke-WebRequest-Demo"><a href="#0x01-Invoke-WebRequest-Demo" class="headerlink" title="0x01 Invoke-WebRequest Demo"></a>0x01 Invoke-WebRequest Demo</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Invoke-WebRequest http://52.80.67.123:8000/get-process.ps1 -OutFile c:\get-process.ps1</span><br></pre></td></tr></table></figure><h2 id="0x02-Reference"><a href="#0x02-Reference" class="headerlink" title="0x02 Reference"></a>0x02 Reference</h2><ul><li><a href="https://docs.microsoft.com/zh-cn/powershell/module/Microsoft.PowerShell.Utility/Invoke-WebRequest?view=powershell-5.1" target="_blank" rel="noopener">Invoke-WebRequest</a></li><li><a href="https://www.pstips.net/cat/powershell-%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B" target="_blank" rel="noopener">PowerShell Guide(Video)</a></li></ul>]]></content>
     
     <summary type="html">
     
       
       
-        &lt;h2 id=&quot;0x00-TL-DR&quot;&gt;&lt;a href=&quot;#0x00-TL-DR&quot; class=&quot;headerlink&quot; title=&quot;0x00 TL;DR&quot;&gt;&lt;/a&gt;0x00 TL;DR&lt;/h2&gt;&lt;p&gt;Linux can use &lt;figure class=&quot;highlight
+        &lt;h2 id=&quot;0x00-TL-DR&quot;&gt;&lt;a href=&quot;#0x00-TL-DR&quot; class=&quot;headerlink&quot; title=&quot;0x00 TL;DR&quot;&gt;&lt;/a&gt;0x00 TL;DR&lt;/h2&gt;&lt;p&gt;Linux can use wget command to download
       
     
     </summary>
