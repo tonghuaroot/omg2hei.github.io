@@ -19,14 +19,16 @@
 <ul>
 <li>check port is open or closed</li>
 <li>read a banner</li>
-<li>To connect to a network service manually<br>example:</li>
+<li>To connect to a network service manually</li>
 </ul>
+<p>example:</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[ec2-user@ip-10-0-0-64 ~]$ nc -nv 10.0.0.64 22</span><br><span class="line">Ncat: Version 7.50 ( https://nmap.org/ncat )</span><br><span class="line">Ncat: Connected to 10.0.0.64:22.</span><br><span class="line">SSH-2.0-OpenSSH_7.4</span><br><span class="line"></span><br><span class="line">Protocol mismatch.</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Ncat: Broken pipe.</span><br><span class="line">[ec2-user@ip-10-0-0-64 ~]$</span><br></pre></td></tr></table></figure>
 <h2 id="0x03-Listening-on-a-TCP-UDP-Port"><a href="#0x03-Listening-on-a-TCP-UDP-Port" class="headerlink" title="0x03 Listening on a TCP/UDP Port"></a>0x03 Listening on a TCP/UDP Port</h2><p>Useful:</p>
 <ul>
 <li>network debugging client applications</li>
-<li>otherwise receiving a TCP/UDP network connection<br>Server side listen TCP port 4444:</li>
+<li>otherwise receiving a TCP/UDP network connection</li>
 </ul>
+<p>Server side listen TCP port 4444:</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[ec2-user@ip-10-0-0-64 ~]$ nc -nvlp 4444</span><br><span class="line">Ncat: Version 7.50 ( https://nmap.org/ncat )</span><br><span class="line">Ncat: Listening on :::4444</span><br><span class="line">Ncat: Listening on 0.0.0.0:4444</span><br></pre></td></tr></table></figure>
 <p>Use netstat can see TCP port 4444 is open.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[ec2-user@ip-10-0-0-64 ~]$ sudo netstat -nltp | grep 4444</span><br><span class="line">tcp        0      0 0.0.0.0:4444            0.0.0.0:*               LISTEN      7427/nc</span><br><span class="line">tcp6       0      0 :::4444                 :::*                    LISTEN      7427/nc</span><br><span class="line">[ec2-user@ip-10-0-0-64 ~]$</span><br></pre></td></tr></table></figure></p>
 <p>Clienr side can connect this TCP port and chat with server side.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[ec2-user@ip-10-0-0-64 ~]$ nc -nv 10.0.0.64 4444</span><br><span class="line">Ncat: Version 7.50 ( https://nmap.org/ncat )</span><br><span class="line">Ncat: Connected to 10.0.0.64:4444.</span><br><span class="line">aaaa</span><br><span class="line">aaaaaaaaaaaaaaaaa</span><br></pre></td></tr></table></figure></p>
