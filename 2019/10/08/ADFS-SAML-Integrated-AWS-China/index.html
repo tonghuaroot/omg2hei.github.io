@@ -1,0 +1,148 @@
+<!DOCTYPE html><html lang="en"><head><meta name="generator" content="Hexo 3.8.0"><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> 如何配置ADFS使域账号可以登陆多个AWS账户 · TonghuaRoot's BloG. - Cyber security enthusiast, not Hacker.</title><meta name="description" content="如何配置ADFS使域账号可以登陆多个AWS账户 - TonghuaRoot"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://tonghuaroot.com/atom.xml" title="TonghuaRoot's BloG. - Cyber security enthusiast, not Hacker."></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="/about" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="https://twitter.com/tonghuaroot" target="_blank" class="nav-list-link">TWITTE</a></li><li class="nav-list-item"><a href="https://github.com/omg2hei" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">如何配置ADFS使域账号可以登陆多个AWS账户</h1><div class="post-info">Oct 9, 2019</div><div class="post-content"><h2 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h2><p>在这篇文章中，我将以中国区AWS为例，向大家介绍如何配置ADFS，使其可以登陆多个AWS账号，以此来简化日常多账号的身份管理及访问控制。<br>这篇文章的定位为对活动目录有一个简单了解的同学，当然即使不了解也没有关系。我会一步步的从域控的搭建到ADFS搭建及配置为大家介绍。</p>
+<h2 id="0x01-准备材料"><a href="#0x01-准备材料" class="headerlink" title="0x01 准备材料"></a>0x01 准备材料</h2><ul>
+<li>ami:Microsoft Windows Server 2016 Base (Chinese Simplified) - ami-0f525133ce76914c1</li>
+</ul>
+<h2 id="0x02-教程大纲"><a href="#0x02-教程大纲" class="headerlink" title="0x02 教程大纲"></a>0x02 教程大纲</h2><ul>
+<li>如何搭建域控制器</li>
+<li>如何安装ADFS服务</li>
+<li>如何配置ADFS服务使其支持多AWS账号登陆</li>
+<li>常见的故障排查方法</li>
+</ul>
+<h2 id="0x03-如何搭建域控制器"><a href="#0x03-如何搭建域控制器" class="headerlink" title="0x03 如何搭建域控制器"></a>0x03 如何搭建域控制器</h2><ul>
+<li>先起来了一台2016的实例，完事分配了一个EIP，因为搭建各种服务器的过程中可能会涉及到重启服务器的情况，如果不使用EIP的话，IP重启后会更换，一来避免每次都要查看，二来也是避免IP更换后导致的非预期报错。</li>
+<li>然后关闭服务器的【IE增强的安全配置】选项，避免有些打开浏览器的操作需要频繁弹窗，操作步骤可以参考下面图片：</li>
+</ul>
+<p><img src="497A2B8C5F8F404F8D4E69890DE50951" alt="image"></p>
+<p><img src="CF88B9E343F34870B453C2680EC6AD0F" alt="image"></p>
+<p><img src="06222CEF68DA4619AC6676C44E8F1B7B" alt="image"></p>
+<ul>
+<li>做好上面的准备工作，下面就可以搭建域控了。</li>
+</ul>
+<p><img src="D345BFDBDFCE4151BF07E3AF3803A41E" alt="image"></p>
+<p><img src="1717FBE292FD4B8CB5435B7B4B7F274B" alt="image"></p>
+<p><img src="1B280ACCAC4F4323B0D5D385BE86E567" alt="image"></p>
+<p><img src="B2F9C68EB40F4EF3ACB6B843CC4EF109" alt="image"></p>
+<p><img src="AD4A36DCA2274D899C3F61399C3F65CE" alt="image"></p>
+<p><img src="305F05AC8D7A4980AC4D16743D5D06F9" alt="image"></p>
+<p><img src="0B41C8843F034821B34F42BE50B83177" alt="image"></p>
+<p><img src="53DEECC3A2FE42D69B8A78E3FCA45788" alt="image"></p>
+<p>点击完【安装】之后一直等着就行了。</p>
+<p><img src="FE312D4F95114E9C9584288C18E38FD8" alt="image"></p>
+<p>功能安装完成之后点击关闭。</p>
+<p><img src="4E6CEBCA5EFF4FBAB03EA6B05D5A769E" alt="image"></p>
+<p>然后接着运行【部署向导】</p>
+<p><img src="3474E032D0C6428E9C15400C56FB7BC3" alt="image"></p>
+<p>因为我们创建的是一个新的域环境，所以此处选择【添加新林】</p>
+<p><img src="A944612C28544E6B9892CF5BD0DE28BA" alt="image"></p>
+<p>此处设置DSRM密码，然后点击下一步</p>
+<p><img src="5B655245E71B423EBD1C2FBC5D41C928" alt="image"></p>
+<p><img src="80E48491507E4DD09823517BC3B03C6D" alt="image"></p>
+<p><img src="0AEB99CDF7EB4942A624F2AEBE3B540D" alt="image"></p>
+<p><img src="467D435928EC420BA8A1574F4F08AEBB" alt="image"></p>
+<p><img src="EAD56110B65E471CA86A578DF88702FB" alt="image"></p>
+<p>接下来，点击【安装】</p>
+<p><img src="CA13655112F1467A910342860C239CC8" alt="image"></p>
+<p>这个时候稍等一会服务器就会自动重启了。待会重新登陆的时候也会比较慢，因为涉及到派发组策略什么的，需要一定的时间。（这个时候域控就建好好了），至于域账号以及分组什么的之后搭ADFS的时候再创建。</p>
+<p>算了还是先建个域管账号吧。打开【服务器管理器】，点击【工具】，点击【Active Directory 用户和计算机】，可以看到如下页面：</p>
+<p><img src="3F366C2D860448B7BD8FEB397E76A5F7" alt="image"></p>
+<p>右键选择【新建】，选择【用户】：</p>
+<p><img src="CEC9674E2E6741F9903B1F4460F93D09" alt="image"></p>
+<p>配置账号密码等相关信息，点击下一步：</p>
+<p><img src="A4B50145582847AF854A2DAB03716498" alt="image"></p>
+<p><img src="35D37B1EDDDB4BD5B46405DCA0ABC484" alt="image"></p>
+<p>右键选择用户，选择【添加到组】，组名选择【Domain Admins】</p>
+<p><img src="CA7DBC419F1444B287D780E3DFCFC449" alt="image"></p>
+<p>可以看到使用新创建的域管已经可以登录到域控了。</p>
+<p><img src="10AB48341599438988911B2C8C3CD329" alt="image"></p>
+<p>至此，域控制器搭建完成。</p>
+<h2 id="0x04-如何安装ADFS服务"><a href="#0x04-如何安装ADFS服务" class="headerlink" title="0x04 如何安装ADFS服务"></a>0x04 如何安装ADFS服务</h2><p>跟搭建域控的时候差不多，选择【添加角色或功能】，选择【下一步】</p>
+<p><img src="E0DA154F8AE4417C952F2E25CA51121F" alt="image"></p>
+<p><img src="0C44BF27A4B4474D8AB6B223A904B557" alt="image"></p>
+<p><img src="1D913D45A37E41348720FA008210638C" alt="image"></p>
+<p>选择【Active Directory 联合身份验证服务】，选择【下一步】</p>
+<p><img src="0F4CF611EA3A4031B8ED65986A8C1FC8" alt="image"></p>
+<p><img src="DDA16183433A4E198074936A6CE9ABE6" alt="image"></p>
+<p><img src="A1500C59F27C4B95AF17BA7D9B5283CA" alt="image"></p>
+<p><img src="FC9CB14A9AA840D0B9BC73DAC97B0652" alt="image"></p>
+<p>安装成功后，点击【关闭】即可。</p>
+<p>ADFS服务安装完成之后，还要顺便安装IIS自签名证书。</p>
+<p>搭建IIS服务器（持续下一步，然后点击安装即可）：</p>
+<p><img src="79E9E922B9104C15BDC04C2383BC39CC" alt="image"></p>
+<p>安装完成后大概长这样：</p>
+<p><img src="BB19DDD3379747BA8DFF89D2CC8F9EA7" alt="image"></p>
+<p>然后开始创建自签名证书：</p>
+<p><img src="AEC82BE8D2BF4C6EB09437871B0ADC9D" alt="image"></p>
+<p><img src="3B36AF0580624F0D87F0990DC8CA9133" alt="image"></p>
+<p><img src="36EA0625D1894C199A6AD450A2FD5EC0" alt="image"></p>
+<p>部署ADFS服务：</p>
+<p><img src="84AB1DFA24BA40ABB566D760F0A9C8E0" alt="image"></p>
+<p><img src="A446146BBFB6470F9BCE2DCFAA264EE3" alt="image"></p>
+<p>这个步骤中，证书用的是之前导出来的自签名证书</p>
+<p><img src="55CEF39BD67D462099F26902E8C37968" alt="image"></p>
+<p>设置一个服务账户</p>
+<p><img src="68C62E4AF8E1494F93C4360ED1C9706D" alt="image"></p>
+<p><img src="7B933DDF5F324BA084256CEB39A9D9AB" alt="image"></p>
+<p><img src="D248370D9BC64675B584A20E3113EFAD" alt="image"></p>
+<p><img src="C9EF2BAC429A4CF183B898F1C1099819" alt="image"></p>
+<p>选择关闭，再重启下服务器。</p>
+<p><img src="DCB41D1FFA4B4E2181D335FCA058CEE6" alt="image"></p>
+<h2 id="0x05-如何配置ADFS服务使其支持多AWS账号登陆"><a href="#0x05-如何配置ADFS服务使其支持多AWS账号登陆" class="headerlink" title="0x05 如何配置ADFS服务使其支持多AWS账号登陆"></a>0x05 如何配置ADFS服务使其支持多AWS账号登陆</h2><ul>
+<li>先下个firefox浏览器，IE太难用了。</li>
+</ul>
+<p>访问这个链接：<a href="https://localhost/adfs/ls/IdpInitiatedSignOn.aspx" target="_blank" rel="noopener">https://localhost/adfs/ls/IdpInitiatedSignOn.aspx</a><br>就可以看到ADFS的登陆页面了，报错的原因是因为我们还没有做相关配置。</p>
+<p><img src="65A63D2544D24618A917BC40C61A29D4" alt="image"></p>
+<p>接下来先把ADFS的metadata下载下来，一会要用到：<a href="https://localhost/FederationMetadata/2007-06/FederationMetadata.xml" target="_blank" rel="noopener">https://localhost/FederationMetadata/2007-06/FederationMetadata.xml</a></p>
+<p>在AWS IAM控制台（<a href="https://console.amazonaws.cn/iam/home?region=cn-north-1#/providers）中创建【身份提供商】，metadata就是刚刚下载到的。" target="_blank" rel="noopener">https://console.amazonaws.cn/iam/home?region=cn-north-1#/providers）中创建【身份提供商】，metadata就是刚刚下载到的。</a></p>
+<p><img src="D222E5AC3B5D4EA595E2708C5CBF3C3F" alt="image"></p>
+<p><img src="D58FE6C5EC054168AE24B15F3EBB6ACE" alt="image"></p>
+<p>接下来创建对应的role，role名称为：ADFS-Admin-Tonghua</p>
+<p>然后回到ADFS，配置ADFS。</p>
+<p>右键选择【ADFS】，选择【添加信赖方信任】<br><img src="5F125C0B5C1946A184594206DCF7A2BD" alt="image"></p>
+<p>选择【启动】，然后添加AWS metadata</p>
+<p><img src="D8C8EB689E3C419BB23131821E36BC4F" alt="image"></p>
+<p>选择【下一步】</p>
+<p><img src="5B866DE422F544DC96BB9BEC24AD6CB4" alt="image"></p>
+<p><img src="84E47B5EE9C342CF88C0190356A428E2" alt="image"></p>
+<p><img src="D106F0521210472394CA44FCCCDD1246" alt="image"></p>
+<p>配置完成后，剩下的就是配置各种声明颁发策略了：</p>
+<p><img src="7AC5C83373F04D96BF1E91E14D722837" alt="image"></p>
+<p><img src="94702A8EF70B4B4BA0D05B5CFCE7DA11" alt="image"></p>
+<p>注意各种声明的格式要一一对上。</p>
+<p>第一条规则配置完成后再继续配置第二条规则：</p>
+<p><img src="E310D7A053164F5C881BEEEBC319D37C" alt="image"></p>
+<p>传入声明类型设置为：<a href="https://aws.amazon.com/SAML/Attributes/RoleSessionName" target="_blank" rel="noopener">https://aws.amazon.com/SAML/Attributes/RoleSessionName</a></p>
+<p><img src="A55FBAE06B7648BFA6ABF3CE04764008" alt="image"></p>
+<p>接下来配置第三条规则：</p>
+<p><img src="BC36AD7C276746AC9DCB9C1EBF1B9479" alt="image"></p>
+<p>自定义规则的内容为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">c:[Type == &quot;http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsaccountname&quot;, Issuer == &quot;AD AUTHORITY&quot;]</span><br><span class="line">=&gt; add(store = &quot;Active Directory&quot;, types = (&quot;http://temp/variable&quot;), query = &quot;;tokenGroups;&#123;0&#125;&quot;, param = c.Value);</span><br></pre></td></tr></table></figure></p>
+<p><img src="2F5274AB61084596BFE3A1ECC1716AE7" alt="image"></p>
+<p>第四条规则：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">c:[Type == &quot;http://temp/variable&quot;, Value =~ &quot;(?i)^AWS-([\d]&#123;12&#125;)&quot;]</span><br><span class="line"> =&gt; issue(Type = &quot;https://aws.amazon.com/SAML/Attributes/Role&quot;, Value = RegExReplace(c.Value, &quot;AWS-([\d]&#123;12&#125;)-&quot;, &quot;arn:aws-cn:iam::$1:saml-provider/AWSADFS,arn:aws-cn:iam::$1:role/&quot;));</span><br></pre></td></tr></table></figure></p>
+<p><img src="B3D5262F15F9468DA193908C6393D28A" alt="image"></p>
+<p>注意替换里头的ARN，组名前缀一类的。</p>
+<p>保存应用即可。</p>
+<p>然后在powershell里执行如下命令（开启ADFS的登陆页，不然会报个错误）：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">set-AdfsProperties -EnableIdPInitiatedSignonPage $true</span><br></pre></td></tr></table></figure></p>
+<p><img src="84DCA3583C3442389C5819E57D944235" alt="image"></p>
+<p>再去AD中创建个组，把用户添加到组中。</p>
+<p><img src="0E1EAA502AEC4C3497549ABB23C2E968" alt="image"></p>
+<p>这个的组名和AWS的role名要对应上。把用户添加到这个组里头。用户也要配置一个电子邮件，用于生产rolesessionname用，否则会报错。</p>
+<p><img src="5E7AD0B0F24749E2B48C052FEFBB35DE" alt="image"></p>
+<p>可以看到，已经登陆成功了。</p>
+<p><img src="D35525139D4B41169E5618112F6C81F4" alt="image"></p>
+<p>至于配置其他账号的，只要在对应的域下创建相应的分组、AWS账号下创建相应的身份提供商，role即可。</p>
+<p>大概长这样：</p>
+<p><img src="F7051BF59F514D83AFAC41FF03F74145" alt="image"></p>
+<h2 id="0x06-常见的故障排查方法"><a href="#0x06-常见的故障排查方法" class="headerlink" title="0x06 常见的故障排查方法"></a>0x06 常见的故障排查方法</h2><ul>
+<li>报错一<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">RoleSessionName is required in AuthnResponse (Service: AWSSecurityTokenService; Status Code: 400; Error Code: InvalidIdentityToken; Request ID: e0aa4b8e-e990-11e9-8d71-e307abd5d2b3). Please try again.</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>报这条错误，一般就是roles这条规则配置的有问题（比如role的arn号等，global用的aws中国区是aws-cn），抓包，base64解码对下就能看到了，还有可能是rolesessionname没设置一类的，这个就要在域账号那一端补充邮件地址。</p>
+<h2 id="0x07-参考链接"><a href="#0x07-参考链接" class="headerlink" title="0x07 参考链接"></a>0x07 参考链接</h2><ul>
+<li><a href="https://aws.amazon.com/cn/blogs/security/aws-federated-authentication-with-active-directory-federation-services-ad-fs/" target="_blank" rel="noopener">AWS Federated Authentication with Active Directory Federation Services (AD FS)</a></li>
+<li><a href="https://docs.amazonaws.cn/IAM/latest/UserGuide/troubleshoot_saml.html#troubleshoot_saml_invalid-response" target="_blank" rel="noopener">Troubleshooting SAML 2.0 Federation with AWS</a></li>
+<li><a href="https://aws.amazon.com/cn/blogs/china/adfs-bjs/" target="_blank" rel="noopener">为AWS北京区管理控制台集成ADFS访问</a></li>
+<li><a href="https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/dn383662(v=ws.11" target="_blank" rel="noopener">Install and Configure the Web Application Proxy Server</a>)</li>
+</ul>
+<h2 id="0x08-Timeline"><a href="#0x08-Timeline" class="headerlink" title="0x08 Timeline"></a>0x08 Timeline</h2><ul>
+<li>2019.10.08 初步完成该文章，并公开发布。</li>
+</ul>
+</div></article></div></main><footer><div class="paginator"><a href="/2019/10/07/My-security-technology-stack/" class="next">NEXT</a></div><div class="copyright"><p>© 2008 - 2019 <a href="https://tonghuaroot.com">TonghuaRoot</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>
