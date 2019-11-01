@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://tonghuaroot.com/"/>
-  <updated>2019-11-01T04:19:40.541Z</updated>
+  <updated>2019-11-01T09:01:13.818Z</updated>
   <id>https://tonghuaroot.com/</id>
   
   <author>
@@ -15,6 +15,27 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>AWS ALB Access log与KMS加密S3 Bucket的那些恩怨情仇</title>
+    <link href="https://tonghuaroot.com/2019/11/01/AWS-ALB-Access-log-And-KMS/"/>
+    <id>https://tonghuaroot.com/2019/11/01/AWS-ALB-Access-log-And-KMS/</id>
+    <published>2019-11-01T00:59:56.000Z</published>
+    <updated>2019-11-01T09:01:13.818Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h2><p>偶然遇到的一个问题，记录一下测试过程。<br>先说结论：AWS ALB Access log推荐使用SSE-S3的加密方式或者不加密的方式。截止目前不支持使用KMS加密的S3 Bucket。</p><h2 id="0x01-ALB配置access-log的常规流程"><a href="#0x01-ALB配置access-log的常规流程" class="headerlink" title="0x01 ALB配置access log的常规流程"></a>0x01 ALB配置access log的常规流程</h2><p>通常情况下，我们要给ALB开一个Access Log除了要选择S3 Bucket外，还要保证目标S3 Bucket有ALB PutObject的权限。<br><img src="A5F92B10074A476F924A5CC8C8CA427E" alt="image"></p><p>示例Policy如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;Version&quot;: &quot;2012-10-17&quot;,</span><br><span class="line">    &quot;Statement&quot;: [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;Effect&quot;: &quot;Allow&quot;,</span><br><span class="line">            &quot;Principal&quot;: &#123;</span><br><span class="line">                &quot;AWS&quot;: &quot;arn:aws-cn:iam::638102146993:root&quot;</span><br><span class="line">            &#125;,</span><br><span class="line">            &quot;Action&quot;: &quot;s3:PutObject&quot;,</span><br><span class="line">            &quot;Resource&quot;: &quot;arn:aws-cn:s3:::aaabbb/*&quot;</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p><p>那如果这个时候S3 Bucket不采用任何加密方式，或者使用SSE-S3的加密方式的话，已经可以正常使用了。</p><p><img src="7C0BFCBF860E46C68F777CAD034B46E3" alt="image"></p><h2 id="0x02-ALB-Access-log-不支持使用KMS加密的S3-Bucket"><a href="#0x02-ALB-Access-log-不支持使用KMS加密的S3-Bucket" class="headerlink" title="0x02 ALB Access log 不支持使用KMS加密的S3 Bucket"></a>0x02 ALB Access log 不支持使用KMS加密的S3 Bucket</h2><p>但是如果要是使用KMS加密的话，直接保存的时候就会报错了，而我也确认在KMS端我们给了ELB服务账号638102146993的访问权限。</p><p><img src="1B8E49A889664B86B9727FD8393BA7C8" alt="image"></p><p>文档里倒是没有明确说明不支持，但是我在<a href="https://forums.aws.amazon.com/message.jspa?messageID=903843" target="_blank" rel="noopener">论坛</a>里看到这么一句话：“storing ALB access logs in a S3 bucket with SSE-KMS encryption enabled is still not supported.”。所以截至目前还没上这个功能呢。</p><h2 id="0x03-先设置为access-log的S3-Bucket，然后再修改为KMS加密会怎么样？"><a href="#0x03-先设置为access-log的S3-Bucket，然后再修改为KMS加密会怎么样？" class="headerlink" title="0x03 先设置为access log的S3 Bucket，然后再修改为KMS加密会怎么样？"></a>0x03 先设置为access log的S3 Bucket，然后再修改为KMS加密会怎么样？</h2><p>然后我又做了这个实验，测试过程：</p><p><img src="6BA7E70DE95C48A2B95BEDCD40B08B09" alt="image"></p><p>这个是之前打进来的测试文件，可以看到，每次设置access log的时候，它会先put一个测试文件，如果put失败了，那也就设置不成功，所以会返回错误。</p><p>回到测试过程，我现在已经将access log配置好了，然后修改了S3的加密方式为KMS加密</p><p><img src="1E8EAE0789454B00B86ECFD47F2F3D41" alt="image"></p><p>等20分钟。</p><p><img src="BD5CEA846AF044E6AAF058385EFA4E2F" alt="image"></p><p>卧槽竟然收到日志了，神奇。。。为了避免是延迟导致的，所以我有做了一个测试，发现还能写进去，加密方式是原来的AES-256（SSE-S3）。interesting</p><p><img src="6ED3F566228446DDB01040B27EA3DA7F" alt="image"></p><h2 id="0x04-结论"><a href="#0x04-结论" class="headerlink" title="0x04 结论"></a>0x04 结论</h2><p>如果要做ALB的Access log，可以使用未加密的S3 Bucket，或者使用SSE-S3加密的S3 Bucket。</p><p>不过为啥我后来改为KMS，但是它成功了（传上去的log加密方式还是AES256 SSE-S3），而在最开始设置的时候就没成功，我理解他背后调用的都是<a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObject.html" target="_blank" rel="noopener">PutObject</a>，既然我加密方式选择为KMS了，但是传上去的log加密却是SSE-S3？interesting。</p><p>嗯，后来请教了大佬，目前就是不支持使用KMS加密的S3 Bucket存放ALB的Access log的。hhh</p><h2 id="0x05-参考链接"><a href="#0x05-参考链接" class="headerlink" title="0x05 参考链接"></a>0x05 参考链接</h2><ul><li><a href="https://forums.aws.amazon.com/message.jspa?messageID=903843" target="_blank" rel="noopener">Storing Application Load Balancer access logs in a KMS-encrypted S3 bucket</a></li><li><a href="https://docs.amazonaws.cn/en_us/elasticloadbalancing/latest/application/load-balancer-access-logs.html" target="_blank" rel="noopener">Access Logs for Your Application Load Balancer</a></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;0x00-前言&quot;&gt;&lt;a href=&quot;#0x00-前言&quot; class=&quot;headerlink&quot; title=&quot;0x00 前言&quot;&gt;&lt;/a&gt;0x00 前言&lt;/h2&gt;&lt;p&gt;偶然遇到的一个问题，记录一下测试过程。&lt;br&gt;先说结论：AWS ALB Access log推荐使用
+      
+    
+    </summary>
+    
+    
+  </entry>
   
   <entry>
     <title>几个关于AWS NLB的有趣问题</title>
