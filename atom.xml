@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://tonghuaroot.com/"/>
-  <updated>2019-11-15T05:49:42.506Z</updated>
+  <updated>2019-11-17T07:16:58.059Z</updated>
   <id>https://tonghuaroot.com/</id>
   
   <author>
@@ -15,6 +15,27 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>S3FS 简介及部署</title>
+    <link href="https://tonghuaroot.com/2019/11/16/how-to-install-S3FS/"/>
+    <id>https://tonghuaroot.com/2019/11/16/how-to-install-S3FS/</id>
+    <published>2019-11-16T23:13:51.000Z</published>
+    <updated>2019-11-17T07:16:58.059Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h2><p>S3FS可以把S3 Bucket可以向挂盘一样，挂在本地，适用于Linux和Mac OS，完事复制粘贴写文件啥的跟普通的文件夹几乎没啥差别，体验很棒。<br>当然，也有一些缺点，这个后面再说。（如果你遇不到它，那就是没缺点，大雾hhh）</p><h2 id="0x01-实验环境"><a href="#0x01-实验环境" class="headerlink" title="0x01 实验环境"></a>0x01 实验环境</h2><ul><li>Amazon Linux 2</li></ul><h2 id="0x02-操作步骤"><a href="#0x02-操作步骤" class="headerlink" title="0x02 操作步骤"></a>0x02 操作步骤</h2><ol><li><p>安装</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo amazon-linux-extras install epel</span><br><span class="line">sudo yum install s3fs-fuse</span><br></pre></td></tr></table></figure></li><li><p>挂载</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">s3fs s3fs-tonghua s3fs_local #（前面是桶名，后面是本地需要挂载到的目录）</span><br></pre></td></tr></table></figure></li></ol><p>如果向上面那么玩，你使用中国区的S3的话，那一定是不成功的。通过debug信息我们可以看到其把请求打到global去了，“那前朝的剑，斩本朝的官”，那自然是行不通的，我们要把region改到中国来。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">s3fs s3fs-tonghua s3fs_local -o dbglevel=info -f -o curldbg # 开启debug日志</span><br></pre></td></tr></table></figure></p><p>可以通过如下方式修改endpoint，可以看到已经成功了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@ip-10-0-0-64 /]# s3fs s3fs-tonghua s3fs_local -o url=https://s3.cn-north-1.amazonaws.com.cn                       [root@ip-10-0-0-64 /]# cd s3fs_local/</span><br><span class="line">[root@ip-10-0-0-64 s3fs_local]# ls</span><br><span class="line">test01_no_version.txt</span><br><span class="line">[root@ip-10-0-0-64 s3fs_local]#</span><br></pre></td></tr></table></figure></p><p>这种情况下，如果我机器重启了，那挂载的S3就没了。所以我们要给他换成/etc/fstab，保证其重启后也无需重新下载。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[ec2-user@ip-10-0-0-64 s3fs_local]$ cat /etc/fstab</span><br><span class="line">#</span><br><span class="line">UUID=8a9e0fcb-f415-4a3f-931d-919fadf8e22c     /           xfs    defaults,noatime  1   1</span><br><span class="line">s3fs#s3fs-tonghua /s3fs_local fuse _netdev,nonempty,allow_other,use_path_request_style,url=https://s3.cn-north-1.amazonaws.com.cn 0 0</span><br><span class="line">[ec2-user@ip-10-0-0-64 s3fs_local]$配置</span><br></pre></td></tr></table></figure></p><p>以上就完成了S3FS的配置。</p><h2 id="0x03-说说S3FS的利弊"><a href="#0x03-说说S3FS的利弊" class="headerlink" title="0x03 说说S3FS的利弊"></a>0x03 说说S3FS的利弊</h2><p>S3FS本质上是对象存储，其跟块存储还是有区别的，块存储我如果修改一个大文件的话，背后只修改对应的block，但是S3就不一样了，如果我传一个超大的文件，几个G或者T的，那他是会整个往S3传的，既费钱还有一致性的问题。<br>然后如果我读写频率太高的话，还容易被服务限制。<br>关于其缺点的话，官方文档说的也比较清楚了，我这头就不再赘述，有兴趣的同学可以去看看：<a href="https://github.com/s3fs-fuse/s3fs-fuse" target="_blank" rel="noopener">https://github.com/s3fs-fuse/s3fs-fuse</a></p><h2 id="0x04-总结"><a href="#0x04-总结" class="headerlink" title="0x04 总结"></a>0x04 总结</h2><p>试了下S3FS，有的场景确实很方便，具体使用的话还是要结合自身业务场景，选择合适的数据传输、存储方式。</p><h2 id="0x05-参考链接"><a href="#0x05-参考链接" class="headerlink" title="0x05 参考链接"></a>0x05 参考链接</h2><ul><li><a href="https://github.com/s3fs-fuse/s3fs-fuse" target="_blank" rel="noopener">FUSE-based file system backed by Amazon S3</a></li><li><a href="http://manpages.ubuntu.com/manpages/xenial/man1/s3fs.1.html" target="_blank" rel="noopener">s3fs</a></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;0x00-前言&quot;&gt;&lt;a href=&quot;#0x00-前言&quot; class=&quot;headerlink&quot; title=&quot;0x00 前言&quot;&gt;&lt;/a&gt;0x00 前言&lt;/h2&gt;&lt;p&gt;S3FS可以把S3 Bucket可以向挂盘一样，挂在本地，适用于Linux和Mac OS，完事复制粘
+      
+    
+    </summary>
+    
+    
+  </entry>
   
   <entry>
     <title>EBS卷挂载不用UUID导致的EC2实例无法正常启动的问题</title>
@@ -415,27 +436,6 @@
       
       
         &lt;h2 id=&quot;Others&quot;&gt;&lt;a href=&quot;#Others&quot; class=&quot;headerlink&quot; title=&quot;Others&quot;&gt;&lt;/a&gt;Others&lt;/h2&gt;&lt;p&gt;The article was first published in:&lt;a href=&quot;https://zh
-      
-    
-    </summary>
-    
-    
-  </entry>
-  
-  <entry>
-    <title>An example of network security problems in the IoT era</title>
-    <link href="https://tonghuaroot.com/2016/10/22/An-example-of-network-security-problems-in-the-IoT-era/"/>
-    <id>https://tonghuaroot.com/2016/10/22/An-example-of-network-security-problems-in-the-IoT-era/</id>
-    <published>2016-10-22T11:12:16.000Z</published>
-    <updated>2019-05-21T17:36:02.417Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="Others"><a href="#Others" class="headerlink" title="Others"></a>Others</h2><p>The article was first published in:<a href="https://www.anquanke.com/post/id/84774" target="_blank" rel="noopener">https://www.anquanke.com/post/id/84774</a></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h2 id=&quot;Others&quot;&gt;&lt;a href=&quot;#Others&quot; class=&quot;headerlink&quot; title=&quot;Others&quot;&gt;&lt;/a&gt;Others&lt;/h2&gt;&lt;p&gt;The article was first published in:&lt;a href=&quot;https://ww
       
     
     </summary>
