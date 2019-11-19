@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://tonghuaroot.com/2019/11/19/AWS-ECS-Fargate/</loc>
+    
+    <lastmod>2019-11-19T12:18:41.103Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://tonghuaroot.com/2019/11/16/how-to-install-S3FS/</loc>
     
     <lastmod>2019-11-17T07:16:58.059Z</lastmod>
