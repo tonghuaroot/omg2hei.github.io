@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://tonghuaroot.com/2019/11/19/AWS-Lambda-Node-js-reverse-shell/</loc>
+    
+    <lastmod>2019-11-19T13:30:08.065Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://tonghuaroot.com/2019/11/19/AWS-ECS-Fargate/</loc>
     
     <lastmod>2019-11-19T12:18:41.103Z</lastmod>
