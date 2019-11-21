@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://tonghuaroot.com/"/>
-  <updated>2019-11-21T13:00:26.729Z</updated>
+  <updated>2019-11-21T13:52:58.358Z</updated>
   <id>https://tonghuaroot.com/</id>
   
   <author>
@@ -15,6 +15,27 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>S3 Bucket 如何配置才能做到只允许某一个IAM User操作？</title>
+    <link href="https://tonghuaroot.com/2019/11/21/S3-Bucket-Policy-Only-One-User/"/>
+    <id>https://tonghuaroot.com/2019/11/21/S3-Bucket-Policy-Only-One-User/</id>
+    <published>2019-11-21T05:52:27.000Z</published>
+    <updated>2019-11-21T13:52:58.358Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h2><p>有这么个需求，我有一个S3 Bucket，然后我只想让某一个User管理，我应该咋操作。<br>简而言之，可以通过Bucket Policy实现，限制某一个IAM User才能访问，然后其他的操作全都deny掉。</p><h2 id="0x01-Policy"><a href="#0x01-Policy" class="headerlink" title="0x01 Policy"></a>0x01 Policy</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;Version&quot;: &quot;2012-10-17&quot;,</span><br><span class="line">    &quot;Statement&quot;: [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;Effect&quot;: &quot;Deny&quot;,</span><br><span class="line">            &quot;Principal&quot;: &quot;*&quot;,</span><br><span class="line">            &quot;Action&quot;: &quot;s3:*&quot;,</span><br><span class="line">            &quot;Resource&quot;: [</span><br><span class="line">                &quot;arn:aws-cn:s3:::bucketname/*&quot;,</span><br><span class="line">                &quot;arn:aws-cn:s3:::bucketname&quot;</span><br><span class="line">            ],</span><br><span class="line">            &quot;Condition&quot;: &#123;</span><br><span class="line">                &quot;StringNotEquals&quot;: &#123;</span><br><span class="line">                    &quot;aws:username&quot;: &quot;username&quot;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>你要是用这个Policy的话，需要修改bucketname、username，别的没啥了。<br>Policy比较简单，大意就是有一个条件aws:username不等于我的username的，我就全都给deny掉。</p><p>这个是允许的user执行结果<br><img src="4D41A2B31F384E2DA5E5E5B8267E14AE" alt="image"></p><p>这个是其他无权限的user<br><img src="7BFCAA733F854E1A930ABC2E83283F1A" alt="image"></p><h2 id="0x02-总结"><a href="#0x02-总结" class="headerlink" title="0x02 总结"></a>0x02 总结</h2><p>可以在根据指定的action做一些精细化的访问控制，不过那就不在这个的讨论范围了。</p><h2 id="0x03-参考链接"><a href="#0x03-参考链接" class="headerlink" title="0x03 参考链接"></a>0x03 参考链接</h2><p>没参考啥，去Policy的控制台测测就完了。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;0x00-前言&quot;&gt;&lt;a href=&quot;#0x00-前言&quot; class=&quot;headerlink&quot; title=&quot;0x00 前言&quot;&gt;&lt;/a&gt;0x00 前言&lt;/h2&gt;&lt;p&gt;有这么个需求，我有一个S3 Bucket，然后我只想让某一个User管理，我应该咋操作。&lt;br&gt;简而
+      
+    
+    </summary>
+    
+    
+  </entry>
   
   <entry>
     <title>聊一聊AssumeRole和Trust Relationship</title>
@@ -416,27 +437,6 @@
       
       
         &lt;h2 id=&quot;0x00-TL-DR&quot;&gt;&lt;a href=&quot;#0x00-TL-DR&quot; class=&quot;headerlink&quot; title=&quot;0x00 TL;DR&quot;&gt;&lt;/a&gt;0x00 TL;DR&lt;/h2&gt;&lt;p&gt;This document records how to set up th
-      
-    
-    </summary>
-    
-    
-  </entry>
-  
-  <entry>
-    <title>How Winodws Escalation Privilege from administrator privilege to system privilege</title>
-    <link href="https://tonghuaroot.com/2019/05/22/How-Winodws-Escalation-Privilege-from-administrator-privilege-to-system-privilege/"/>
-    <id>https://tonghuaroot.com/2019/05/22/How-Winodws-Escalation-Privilege-from-administrator-privilege-to-system-privilege/</id>
-    <published>2019-05-22T07:45:32.000Z</published>
-    <updated>2019-05-29T08:43:44.831Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="0x00-TL-DR"><a href="#0x00-TL-DR" class="headerlink" title="0x00 TL;DR"></a>0x00 TL;DR</h2><p>Record how Winodws Escalation Privilege from administrator privilege to system privilege.<br>Use psexec can do it.</p><h2 id="0x01-Steps"><a href="#0x01-Steps" class="headerlink" title="0x01 Steps"></a>0x01 Steps</h2><p>download:<a href="https://download.sysinternals.com/files/PSTools.zip" target="_blank" rel="noopener">https://download.sysinternals.com/files/PSTools.zip</a></p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\Administrator\Downloads\PSTools&gt;whoami</span><br><span class="line">ec2amaz-okarxxx\administrator</span><br><span class="line"></span><br><span class="line">C:\Users\Administrator\Downloads\PSTools&gt; .\psexec -i -s -d cmd</span><br><span class="line"></span><br><span class="line">PsExec v2.2 - Execute processes remotely</span><br><span class="line">Copyright (C) 2001-2016 Mark Russinovich</span><br><span class="line">Sysinternals - www.sysinternals.com</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">cmd started on EC2AMAZ-OKARXXX with process ID 7848.</span><br><span class="line"></span><br><span class="line">C:\Users\Administrator\Downloads\PSTools&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">C:\Windows\system32&gt;whoami</span><br><span class="line">nt authority\system</span><br><span class="line"></span><br><span class="line">C:\Windows\system32&gt;</span><br></pre></td></tr></table></figure><h2 id="0x02-Reference"><a href="#0x02-Reference" class="headerlink" title="0x02 Reference"></a>0x02 Reference</h2><ul><li><a href="https://docs.microsoft.com/en-us/sysinternals/downloads/pstools" target="_blank" rel="noopener">PsTools</a></li><li><a href="https://forums.aws.amazon.com/thread.jspa?threadID=255037" target="_blank" rel="noopener">AWS-ApplyPatchBaseline run command fails when running behind a proxy server</a></li></ul>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h2 id=&quot;0x00-TL-DR&quot;&gt;&lt;a href=&quot;#0x00-TL-DR&quot; class=&quot;headerlink&quot; title=&quot;0x00 TL;DR&quot;&gt;&lt;/a&gt;0x00 TL;DR&lt;/h2&gt;&lt;p&gt;Record how Winodws Escalation Privileg
       
     
     </summary>
