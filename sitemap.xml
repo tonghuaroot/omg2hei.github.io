@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://tonghuaroot.com/2019/11/25/AWS-IAM-MFA-force-console-no-use-MFA-in-CLI/</loc>
+    
+    <lastmod>2019-11-25T08:50:22.016Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://tonghuaroot.com/2019/11/23/Specify-IP-Use-AWS/</loc>
     
     <lastmod>2019-11-23T15:56:00.653Z</lastmod>
