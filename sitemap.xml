@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://tonghuaroot.com/friends/index.html</loc>
+    
+    <lastmod>2020-01-01T13:28:12.223Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://tonghuaroot.com/2019/11/25/AWS-IAM-MFA-force-console-no-use-MFA-in-CLI/</loc>
     
     <lastmod>2019-11-25T08:50:22.016Z</lastmod>
@@ -110,13 +117,6 @@
     <loc>https://tonghuaroot.com/2019/10/13/OSCP-Vulnhub-Kioptrix-Level-1-Writeup/</loc>
     
     <lastmod>2019-10-13T12:35:26.569Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://tonghuaroot.com/friends/index.html</loc>
-    
-    <lastmod>2019-10-10T15:39:33.562Z</lastmod>
     
   </url>
   
