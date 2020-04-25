@@ -1,0 +1,35 @@
+<!DOCTYPE html><html lang="en"><head><meta name="generator" content="Hexo 3.8.0"><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> CobaltStrike Aggressor Script 实现 Beacon 上线告警功能 · TonghuaRoot's BloG. - Cyber security enthusiast, not Hacker.</title><meta name="description" content="CobaltStrike Aggressor Script 实现 Beacon 上线告警功能 - TonghuaRoot"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://tonghuaroot.com/atom.xml" title="TonghuaRoot's BloG. - Cyber security enthusiast, not Hacker."></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="/about" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="https://twitter.com/tonghuaroot" target="_blank" class="nav-list-link">TWITTE</a></li><li class="nav-list-item"><a href="https://github.com/omg2hei" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/friends" target="_self" class="nav-list-link">FRS</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">CobaltStrike Aggressor Script 实现 Beacon 上线告警功能</h1><div class="post-info">Apr 25, 2020</div><div class="post-content"><h2 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h2><p>把之前写的一个笔记翻出来，思路比较简单，所以也就不额外的添加内容直接发出来了。</p>
+<p>最近在研究CobaltStrike，有一个使用场景是说，当我把钓鱼邮件发出去了，等着Beacon上线的这段时间是无感知的，也就是说什么时候上线不知道、上没上线也不知道。传统的解决方案是说抽空上来瞅一眼，长远来讲这种方法是低效且不可靠的（emm，看日志可以知道shell来过又掉了hhh）。<br>而我个人做事的态度是比较推崇流程化、工具化、自动化和文档化的，所以便想着可以配合一些IM实现Beacon上线以及System Profiler触发的实时告警，方便RedTeamer及时响应做后续的操作。</p>
+<h2 id="0x01-告警项"><a href="#0x01-告警项" class="headerlink" title="0x01 告警项"></a>0x01 告警项</h2><ul>
+<li>Beacon</li>
+<li>System Profiler</li>
+<li>Clone Site</li>
+<li>etc…</li>
+</ul>
+<h2 id="0x02-需要适配的IM"><a href="#0x02-需要适配的IM" class="headerlink" title="0x02 需要适配的IM"></a>0x02 需要适配的IM</h2><ul>
+<li>钉钉</li>
+<li>微信</li>
+<li>企业微信</li>
+<li>Slack</li>
+<li>Telegram</li>
+<li>Chime</li>
+<li>Mail</li>
+<li>自定义函数（方便后续其他IM适配）</li>
+</ul>
+<h2 id="0x03-实现思路"><a href="#0x03-实现思路" class="headerlink" title="0x03 实现思路"></a>0x03 实现思路</h2><p>代码量不多，整体的思路是，当事件触发时调用 HTTP POST/GET 请求，callback对应的IM应用接收消息，工作量主要集中在各类 IM webhook 的接口申请上，或者未开放接口的，要找一些第三方的开源解决方案，效果图如下：</p>
+<p><img src="01.png" alt="01"></p>
+<p><img src="02.png" alt="02"></p>
+<p>参考文档：<a href="https://www.cobaltstrike.com/aggressor-script/events.html" target="_blank" rel="noopener">https://www.cobaltstrike.com/aggressor-script/events.html</a> ，获取 Cobalt Strike 的 event list。</p>
+<p>结合 Headless Cobalt Strike 可以应用到将 cna 脚本的功能同步至连接同一 teamserver 的全部 Cobalt Strike Client，参考：<a href="https://www.cobaltstrike.com/aggressor-script/index.html" target="_blank" rel="noopener">https://www.cobaltstrike.com/aggressor-script/index.html</a></p>
+<p>这么做有一个好处，避免 Cobalt Strike Client 所处的网络不稳导致无法实时感知 Beacon 上线行为，协同作战的时候也比较方便。</p>
+<p>代码放在 Github 上了：<a href="https://github.com/omg2hei/CobaltStrikeAggressor/blob/master/CSNotification.cna" target="_blank" rel="noopener">https://github.com/omg2hei/CobaltStrikeAggressor/blob/master/CSNotification.cna</a></p>
+<h2 id="0x04-后记"><a href="#0x04-后记" class="headerlink" title="0x04 后记"></a>0x04 后记</h2><p>Aggressor 脚本写起来并不难，主要还是安全思路的价值大于软件工程，最近在整理一些基础功能的cna代码，以期当有更好的安全思路时可以快速构建PoC，验证思路的价值。</p>
+<h2 id="0x05-参考链接"><a href="#0x05-参考链接" class="headerlink" title="0x05 参考链接"></a>0x05 参考链接</h2><ul>
+<li>[1] 利用钉钉机器人发送告警信息, <a href="https://www.jianshu.com/p/52b5861ded59" target="_blank" rel="noopener">https://www.jianshu.com/p/52b5861ded59</a></li>
+<li>[2] Slack Notifications for Cobalt Strike, <a href="https://threatexpress.com/blogs/2016/slack-notifications-for-cobalt-strike/#slack-notifications-for-cobalt-strike" target="_blank" rel="noopener">https://threatexpress.com/blogs/2016/slack-notifications-for-cobalt-strike/#slack-notifications-for-cobalt-strike</a></li>
+<li>[3] <a href="https://github.com/dcsync/pycobalt/blob/master/docs/aggressor.md" target="_blank" rel="noopener">https://github.com/dcsync/pycobalt/blob/master/docs/aggressor.md</a></li>
+<li>[4] 自动化工具 钉钉机器人消息 Python 封装 (开源), <a href="https://testerhome.com/topics/11758" target="_blank" rel="noopener">https://testerhome.com/topics/11758</a></li>
+<li>[5] Cobalt Strike神器高级教程利用Aggressor脚本编写目标上线邮件提醒, <a href="https://blog.csdn.net/qq_27446553/article/details/79380021" target="_blank" rel="noopener">https://blog.csdn.net/qq_27446553/article/details/79380021</a></li>
+<li>[6] aggressor_scripts/http.cna, <a href="https://github.com/001SPARTaN/aggressor_scripts/blob/master/http.cna" target="_blank" rel="noopener">https://github.com/001SPARTaN/aggressor_scripts/blob/master/http.cna</a></li>
+</ul>
+</div></article></div></main><footer><div class="paginator"><a href="/2020/03/02/how-to-use-hashcat-to-crack-ntlmv2-hash/" class="next">NEXT</a></div><div class="copyright"><p>© 2008 - 2020 <a href="https://tonghuaroot.com">TonghuaRoot</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>
