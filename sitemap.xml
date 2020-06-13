@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://tonghuaroot.com/friends/index.html</loc>
+    
+    <lastmod>2020-06-13T12:34:18.991Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://tonghuaroot.com/2020/05/21/Use-CloudWatch-Event-to-monitor-ElasticSearch-events/</loc>
     
     <lastmod>2020-05-27T08:07:44.045Z</lastmod>
@@ -19,13 +26,6 @@
     <loc>https://tonghuaroot.com/2020/04/25/Cobalt-Strike-Aggressor-Script-IM-Alert/</loc>
     
     <lastmod>2020-04-25T08:48:54.899Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://tonghuaroot.com/friends/index.html</loc>
-    
-    <lastmod>2020-04-06T10:44:17.267Z</lastmod>
     
   </url>
   
