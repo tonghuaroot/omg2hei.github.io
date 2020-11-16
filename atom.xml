@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://tonghuaroot.com/"/>
-  <updated>2020-09-14T10:28:42.057Z</updated>
+  <updated>2020-11-16T12:46:19.330Z</updated>
   <id>https://tonghuaroot.com/</id>
   
   <author>
@@ -15,6 +15,27 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Smogcloud - AWS external network asset discovery platform</title>
+    <link href="https://tonghuaroot.com/2020/11/16/Smogcloud-AWS-external-network-asset-discovery-platform/"/>
+    <id>https://tonghuaroot.com/2020/11/16/Smogcloud-AWS-external-network-asset-discovery-platform/</id>
+    <published>2020-11-16T12:31:54.000Z</published>
+    <updated>2020-11-16T12:46:19.330Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h2><p>对于一家大量采用AWS的甲方企业来说，如何实时的发现暴露在外网的AWS资产对其进行企业安全建设来说则至关重要。这些暴露在外面的AWS资产就是潜在的攻击面，我们可以这些资产进行更高优先级的监控，确保当出现安全问题时可以第一时间进行事件响应。而来我们也可以对这些暴露再外的资产进行高优先级的风险评估，尽量避免其出现已知的安全问题。当然，随着业务的发展，暴露在外的资产信息也是动态变化的，如何实时的收集到这些变化的动态资产信息，进行高优先级的风险评估是一个值得思考的问题。<br>我们没有办法保护我们看不到的资产，在这篇文章中，我主要记录一下我对Smogcloud这款开源项目的一些研究，以及如何配合Smogcloud和其他工具耦合起来实现高效且稳定的AWS公网资产监控平台。</p><h2 id="0x01-Smogcloud-简介"><a href="#0x01-Smogcloud-简介" class="headerlink" title="0x01 Smogcloud 简介"></a>0x01 Smogcloud 简介</h2><p>如 Smogcloud 的 README 页面所述，其主要解决的问题就是发现暴露在外网的AWS资产，全量、实时、稳定的AWS资产监控平台是我们实施下一步安全手段的第一步。<br>Smogcloud 主要解决的问题如下：</p><ol><li>针对多个AWS账号进行外网资产发现</li><li>针对这些资产进行检查是否存在错误配置或者相关安全问题</li><li>识别长时间未使用的资产</li><li>识别未被监控到的资产</li><li>Shadow IT</li></ol><h2 id="0x02-当前环境"><a href="#0x02-当前环境" class="headerlink" title="0x02 当前环境"></a>0x02 当前环境</h2><ul><li>Amazon Linux 2</li><li>Golang 1.15.5</li></ul><h2 id="0x03-Smogcloud-的安装和配置"><a href="#0x03-Smogcloud-的安装和配置" class="headerlink" title="0x03 Smogcloud 的安装和配置"></a>0x03 Smogcloud 的安装和配置</h2><p>由于 Smogcloud  是基于 Golang 开发的，在使用 Smogcloud 之前我们要先安装Golang的开发环境。看了下代码写的还是比较简洁的，直接拿来用用，后面需要的话直接上手改代码简单扩展一些也是ok的。<br>一、Golang 的安装和配置步骤如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">wget https://golang.org/dl/go1.15.5.linux-amd64.tar.gz</span><br><span class="line">vim ~/.bash_profile</span><br><span class="line">export PATH=$PATH:/usr/local/go/bin</span><br><span class="line">source ~/.bash_profile</span><br><span class="line">go version</span><br></pre></td></tr></table></figure></p><p>安装成功之后会展示出如下信息：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@ip-10-188-188-188 ec2-user]# go  version</span><br><span class="line">go version go1.15.5 linux/amd64</span><br></pre></td></tr></table></figure></p><p>二、安装 Smogcloud<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">go get -u github.com/BishopFox/smogcloud</span><br><span class="line">smogcloud</span><br></pre></td></tr></table></figure></p><p>出现这个报错的话，说明我们已经安装成功了，接下来我们需要配置账号ID和访问凭证，来进行资产收集了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@ip-10-188-188-188 ec2-user]# smogcloud</span><br><span class="line"></span><br><span class="line"> Cannot list functions for region us-east-1</span><br><span class="line">NoCredentialProviders: no valid providers in chain. Deprecated.</span><br><span class="line">For verbose messaging see aws.Config.CredentialsChainVerboseErrors</span><br></pre></td></tr></table></figure></p><p>三、配置 Smogcloud<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">export AWS_ACCOUNT_ID=&apos;&apos;            # Describe account</span><br><span class="line">export AWS_ACCESS_KEY_ID=&apos;&apos;         # Access key for aws account</span><br><span class="line">export AWS_SECRET_ACCESS_KEY=&apos;&apos;     # Secret key for aws account</span><br></pre></td></tr></table></figure></p><p>配置完成之后再次运行smogcloud执行，对这些暴露在外网的资产进行收集。<br>收集完成之后相关结果保存在results文件夹下。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@ip-10-188-188-188 results]# tree</span><br><span class="line">.</span><br><span class="line">|-- apigateway</span><br><span class="line">|   `-- 123456789012.us-west-2.json</span><br><span class="line">|-- ec2</span><br><span class="line">|   `-- 123456789012.us-west-2.json</span><br><span class="line">|-- iot</span><br><span class="line">|   |-- 123456789012.us-west-2.json</span><br><span class="line">|   `-- 123456789012.us-east-1.json</span><br><span class="line">`-- s3</span><br><span class="line">    `-- 123456789012.global.json</span><br><span class="line"></span><br><span class="line">4 directories, 5 files</span><br></pre></td></tr></table></figure></p><h2 id="0x04-Smogcloud-的二次开发"><a href="#0x04-Smogcloud-的二次开发" class="headerlink" title="0x04 Smogcloud 的二次开发"></a>0x04 Smogcloud 的二次开发</h2><p>Smogcloud 本质上是调研AWS Golang SDK获取资产信息对于符合条件的资产进行收集。严格来讲，其仅仅是一个用于收集信息的脚本，我们可以顺着这个思路进行二次开发，将收集到的信息进行入库及分析展示。<br>这里举一个小例子，通过收集包含工网IP的EC2实例，结合其附加的安全组以及端口扫描情况可以梳理出来对外暴露的端口。对于不合规的端口进行告警，对于必须暴露的端口如Web应用进行其他手段的安全测试。对于其他的服务，如S3一类的，也是同样的思路。<br>再就是如何配合AWS Config服务，利用Config服务收集资产信息，配合rule进行合规性检查。</p><h2 id="0x05-参考链接"><a href="#0x05-参考链接" class="headerlink" title="0x05 参考链接"></a>0x05 参考链接</h2><p>[1] Smogcloud：<a href="https://github.com/BishopFox/smogcloud" target="_blank" rel="noopener">https://github.com/BishopFox/smogcloud</a><br>[2] Golang Installation, Setup, GOPATH, and Go Workspace <a href="https://www.callicoder.com/golang-installation-setup-gopath-workspace/" target="_blank" rel="noopener">https://www.callicoder.com/golang-installation-setup-gopath-workspace/</a></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;0x00-前言&quot;&gt;&lt;a href=&quot;#0x00-前言&quot; class=&quot;headerlink&quot; title=&quot;0x00 前言&quot;&gt;&lt;/a&gt;0x00 前言&lt;/h2&gt;&lt;p&gt;对于一家大量采用AWS的甲方企业来说，如何实时的发现暴露在外网的AWS资产对其进行企业安全建设来说则
+      
+    
+    </summary>
+    
+    
+  </entry>
   
   <entry>
     <title>Write a simple HTTPS server use Go</title>
@@ -418,28 +439,6 @@
       
       
         &lt;h2 id=&quot;0x00-前言&quot;&gt;&lt;a href=&quot;#0x00-前言&quot; class=&quot;headerlink&quot; title=&quot;0x00 前言&quot;&gt;&lt;/a&gt;0x00 前言&lt;/h2&gt;&lt;p&gt;偶然遇到的一个问题，记录一下测试过程。&lt;br&gt;先说结论：AWS ALB Access log推荐使用
-      
-    
-    </summary>
-    
-    
-  </entry>
-  
-  <entry>
-    <title>几个关于AWS NLB的有趣问题</title>
-    <link href="https://tonghuaroot.com/2019/11/01/about-aws-nlb-interesting-qa/"/>
-    <id>https://tonghuaroot.com/2019/11/01/about-aws-nlb-interesting-qa/</id>
-    <published>2019-10-31T20:11:59.000Z</published>
-    <updated>2019-11-01T04:19:40.000Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h2><p>分享几个关于NLB的有趣问题。</p><h2 id="0x01-架构概述"><a href="#0x01-架构概述" class="headerlink" title="0x01 架构概述"></a>0x01 架构概述</h2><ol><li>我有一个internal的NLB（跨两个AZ），监听33端口</li><li>NLB后端有1个EC2实例（实例B），监听22端口</li><li>我还有一个EC2实例作为客户端（实例A）</li></ol><h2 id="0x02-相关问题"><a href="#0x02-相关问题" class="headerlink" title="0x02 相关问题"></a>0x02 相关问题</h2><h3 id="2-1-实例B不能正常访问NLB，但是实例A可以"><a href="#2-1-实例B不能正常访问NLB，但是实例A可以" class="headerlink" title="2.1 实例B不能正常访问NLB，但是实例A可以"></a>2.1 实例B不能正常访问NLB，但是实例A可以</h3><p>这个最开始我还觉得奇怪，手动测试了一下，确实是这样：<br>实例B（10.0.0.64是实例B的IP，10.0.1.170是NLB的IP）：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[ec2-user@ip-10-0-0-64 ~]$ nc -vz 10.0.1.170 33</span><br><span class="line">Ncat: Version 7.50 ( https://nmap.org/ncat )</span><br><span class="line">Ncat: Connection timed out.</span><br><span class="line">[ec2-user@ip-10-0-0-64 ~]$ nc -vz 10.0.0.64 22</span><br><span class="line">Ncat: Version 7.50 ( https://nmap.org/ncat )</span><br><span class="line">Ncat: Connected to 10.0.0.64:22.</span><br><span class="line">Ncat: 0 bytes sent, 0 bytes received in 0.01 seconds.</span><br><span class="line">[ec2-user@ip-10-0-0-64 ~]$</span><br></pre></td></tr></table></figure></p><p><img src="F1C5DB5028914663903053D20CFBFC65" alt="image"></p><p>实例A访问NLB和实例B都是可以正常访问的：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[2019-11-01 11:53.25]  ~</span><br><span class="line">[Administrator.EC2AMAZ-OKAR8BT] ➤ nc -vz 10.0.1.170 33</span><br><span class="line">Connection to 10.0.1.170 33 port [tcp/*] succeeded!</span><br><span class="line">[2019-11-01 11:53.27]  ~</span><br><span class="line">[Administrator.EC2AMAZ-OKAR8BT] ➤ nc -vz 10.0.0.64 22</span><br><span class="line">Connection to 10.0.0.64 22 port [tcp/ssh] succeeded!</span><br></pre></td></tr></table></figure><p><img src="A2836EBDE268492F98B00552DCDC1570" alt="image"></p><p>请教了一下大佬，这种现象其实是正常的，NLB做的流量转发会把目的IP地址转过去，如果我src IP与dst的IP相等的话，那自然会被丢弃掉，这也就造成了，如果我在后端实例上访问NLB的端口会出现time out的现象。</p><p>此外，NLB的官方文档也有对此部分的说明，可以参考：<a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-troubleshooting.html" target="_blank" rel="noopener">Troubleshoot Your Network Load Balancer</a>中“Connections time out for requests from a target to its load balancer”部分。</p><p>上面我是通过实例ID注册的，那我如果通过IP注册（这也是文档中提到的解决方法之一）的话，就不会有这个问题了。效果如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@ip-10-0-0-64 about-aws-nlb-interesting-qa]# nc -vz 10.0.1.170 44</span><br><span class="line">Ncat: Version 7.50 ( https://nmap.org/ncat )</span><br><span class="line">Ncat: Connected to 10.0.1.170:44.</span><br><span class="line">Ncat: 0 bytes sent, 0 bytes received in 0.01 seconds.</span><br></pre></td></tr></table></figure></p><p><img src="914F39EB23C34964A613ADC90E28C669" alt="image"></p><h3 id="2-2-NLB如果不开通“Cross-Zone-Load-Balancing”功能，流量是不会跨AZ转发至后端EC2实例的"><a href="#2-2-NLB如果不开通“Cross-Zone-Load-Balancing”功能，流量是不会跨AZ转发至后端EC2实例的" class="headerlink" title="2.2 NLB如果不开通“Cross-Zone Load Balancing”功能，流量是不会跨AZ转发至后端EC2实例的"></a>2.2 NLB如果不开通“Cross-Zone Load Balancing”功能，流量是不会跨AZ转发至后端EC2实例的</h3><p>这个场景比如说，我有一个NLB跨了两个AZ（cn-north-1a，cn-north-1b），然后我后端仅有1台EC2实例（在cn-north-1b中）。如果我访问cn-north-1a的NLB IP，则会出现访问超时的现象，而访问cn-north-1b则不会有这个问题。这是因为我如果没开“Cross-Zone Load Balancing”功能的话，流量是不会跨AZ转发的。</p><p>开通“Cross-Zone Load Balancing”功能的方法也很简单，console上点一下：</p><p><img src="95AF595C05FF424F97383A550BB86052" alt="image"></p><p>完事现在支持跨AZ负载均衡就没啥问题了，当然如果不考虑高可用NLB只有一个AZ的话也没有这个问题了。</p><p>(以上内容目前仅测试了internal NLB)</p><h2 id="0x03-参考链接"><a href="#0x03-参考链接" class="headerlink" title="0x03 参考链接"></a>0x03 参考链接</h2><ul><li><a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-troubleshooting.html" target="_blank" rel="noopener">Troubleshoot Your Network Load Balancer</a></li></ul>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h2 id=&quot;0x00-前言&quot;&gt;&lt;a href=&quot;#0x00-前言&quot; class=&quot;headerlink&quot; title=&quot;0x00 前言&quot;&gt;&lt;/a&gt;0x00 前言&lt;/h2&gt;&lt;p&gt;分享几个关于NLB的有趣问题。&lt;/p&gt;
-&lt;h2 id=&quot;0x01-架构概述&quot;&gt;&lt;a href=&quot;#0
       
     
     </summary>
