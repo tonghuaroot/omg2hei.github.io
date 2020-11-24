@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://tonghuaroot.com/about/index.html</loc>
+    
+    <lastmod>2020-11-24T07:15:19.591Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://tonghuaroot.com/2020/11/16/Smogcloud-AWS-external-network-asset-discovery-platform/</loc>
     
     <lastmod>2020-11-16T12:46:19.330Z</lastmod>
@@ -33,13 +40,6 @@
     <loc>https://tonghuaroot.com/2020/05/22/Use-CloudWatch-Event-to-monitor-ElasticSearch-events/</loc>
     
     <lastmod>2020-05-27T08:07:44.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://tonghuaroot.com/about/index.html</loc>
-    
-    <lastmod>2020-04-25T09:13:24.000Z</lastmod>
     
   </url>
   
