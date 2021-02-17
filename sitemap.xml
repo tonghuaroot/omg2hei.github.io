@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://tonghuaroot.com/about/index.html</loc>
+    
+    <lastmod>2021-02-17T06:50:22.248Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://tonghuaroot.com/friends/index.html</loc>
     
     <lastmod>2021-01-18T10:43:10.571Z</lastmod>
@@ -12,13 +19,6 @@
     <loc>https://tonghuaroot.com/2020/11/25/This-is-a-test-page-for-testing-Github-Action/</loc>
     
     <lastmod>2020-11-26T12:46:38.614Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://tonghuaroot.com/about/index.html</loc>
-    
-    <lastmod>2020-11-24T07:15:19.591Z</lastmod>
     
   </url>
   
