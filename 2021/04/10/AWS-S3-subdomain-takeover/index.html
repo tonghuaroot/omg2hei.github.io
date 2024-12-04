@@ -1,0 +1,82 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> AWS S3 subdomain takeover · TonghuaRoot's BloG. - Cyber security enthusiast, not Hacker.</title><meta name="description" content="AWS S3 subdomain takeover - TonghuaRoot"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://tonghuaroot.com/atom.xml" title="TonghuaRoot's BloG. - Cyber security enthusiast, not Hacker."><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="TonghuaRoot's BloG. - Cyber security enthusiast, not Hacker." type="application/atom+xml">
+</head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="/about" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="https://twitter.com/tonghuaroot" target="_blank" class="nav-list-link">TWITTE</a></li><li class="nav-list-item"><a href="https://github.com/tonghuaroot" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/friends" target="_self" class="nav-list-link">FRS</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">AWS S3 subdomain takeover</h1><div class="post-info">Apr 10, 2021</div><div class="post-content"><p>浅析 AWS S3 子域名接管漏洞</p>
+<h2 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h2><p>哈喽，大家好，我是童话。</p>
+<p>前段时间和 @鶇 师傅讨论了一个特殊场景下的子域名接管漏洞，蛮 trick 的一个利用方法。我们见到有白帽子确实利用成功了，然后想了下，理论可行，但是我还没来得及做测试，所以不是今天讨论的重点，后面有机会再和大家分享。</p>
+<p>步入正题，今天就以 AWS S3 为例，来跟大家分享一下什么是子域名接管（subdomain takeower）漏洞，以及如何挖掘子域名接管漏洞。</p>
+<p>全文主要包含如下几部分内容：</p>
+<ol>
+<li>什么是子域名接管漏洞？</li>
+<li>子域名接管漏洞有哪些危害（利用场景）？</li>
+<li>什么是 AWS S3？</li>
+<li>在什么场景下，AWS S3 会出现子域名接管漏洞？</li>
+<li>（攻）如何自动化挖掘子域名接管漏洞？</li>
+<li>（防）如何缓解子域名接管漏洞的危害？</li>
+<li>碎碎念</li>
+</ol>
+<h2 id="0x01-什么是子域名接管漏洞？"><a href="#0x01-什么是子域名接管漏洞？" class="headerlink" title="0x01 什么是子域名接管漏洞？"></a>0x01 什么是子域名接管漏洞？</h2><p>子域名接管漏洞通常是由于域名管理员将企业拥有的子域名解析至未被使用的第三方 SaaS 服务上导致的。</p>
+<p>攻击者可以控制该第三方服务页面的内容，子域名解析至这个可以被攻击者控制的第三方服务页面，进而可以利用该子域名接管漏洞实施攻击。</p>
+<p>常见的由于错误的配置容易导致子域名接管漏洞的 SaaS 服务有：Github Pages、AWS S3、Wordpress 等，关于目前已知公开可以被接管的服务，可以参考链接[3]获取详细列表。</p>
+<h2 id="0x02-子域名接管漏洞有哪些危害（利用场景）？"><a href="#0x02-子域名接管漏洞有哪些危害（利用场景）？" class="headerlink" title="0x02 子域名接管漏洞有哪些危害（利用场景）？"></a>0x02 子域名接管漏洞有哪些危害（利用场景）？</h2><p>说到这里，有的同学可能就会问了，域名管理员为什么要把子域名解析到未被使用的第三方服务上呢，这个人也太不专业了吧。</p>
+<p>抛开专业与否不谈，就我遇到的几个案例来看，大多数情况是由于因为业务需求将子域名解析到了第三方服务上（比如说将子域名解析到 AWS S3 上托管一些静态的 HTML/JS 资源），但是由于业务调整，删除了这些不在使用的第三方服务（S3 Bucket 被删了），而此时的域名解析仍然存在，因此，产生了子域名接管漏洞，这种场景很常见。</p>
+<p>那可能有的同学又要说了，这是网络资源管理不规范导致的啊，是不是这个企业的体量太小，没有规范的产品上线流程呢？是，也不是，一方面肯定是跟域名管理流程脱不开关系，另一方面这个和企业体量并不直接相关，反倒是越大的企业，因为其线上业务的复杂性，越容易出现这些照顾不到的薄弱点。（这也就是安全行业经常提到的，越大的企业越容易搞，越容易突破边界，反倒是那些挂了一个静态页面或者搞了个啥插件都没有的 Wordpress Blog，难搞的一逼。）</p>
+<p>废话不多说，上几个数据支撑。</p>
+<p>这个是我两年前挖到的一个微软的子域名接管漏洞：</p>
+<p><img src="https://files.mdnice.com/user/12658/78b32fed-221b-4735-b10f-7b3e025cbb61.png" alt=""></p>
+<p>经常玩 HackerOne 的朋友肯定会知道，星巴克和 Mail.ru 这几年在子域名接管漏洞上也是发出了大量的 bounty（赏金）[4]。</p>
+<p><img src="https://files.mdnice.com/user/12658/126073a5-be75-4c9c-9d38-70aebea17c99.png" alt=""></p>
+<p><img src="https://files.mdnice.com/user/12658/cfedfe53-b971-4c3f-be1b-e28d1f9af3f3.png" alt=""></p>
+<p>可以看到，各类厂商都是非常愿意为这类漏洞买单的，我个人认为子域名接管漏洞，属于利用成本低，危害较大的一个漏洞类型。</p>
+<p>那我们接下来就聊一下，子域名接管漏洞的实际危害和利用场景。</p>
+<h3 id="1"><a href="#1" class="headerlink" title="1."></a>1.</h3><p>相对比较容易理解的一个场景就是，作为攻击者，可以直接篡改子域名的内容，种马，搞一些钓鱼啊这类的。</p>
+<p>这里有一个很有意思的一个点，很多企业的邮件安全网关都会对邮件中的第三方链接、附件等进行安全检测、跑沙箱等等检测是否有异常行为。</p>
+<p>而针对企业自身的域名往往会采用白名单放行，接下来怎么玩，不用我多说了吧。（也别问我是怎么知道的 hhh</p>
+<h3 id="2"><a href="#2" class="headerlink" title="2."></a>2.</h3><p>再就是可以利用子域名接管漏洞，搞一些 XSS，劫持受害者的 Cookie。</p>
+<p>比如说，一些站点会加载这个域名下的一些 js，而这个子域名中的内容是可控的，进而我们可以将这个子域名接管漏洞转换成一个存储型的 XSS 漏洞。</p>
+<p>在一些微服务的业务场景下，主域名和子域名是共享 cookie 的，如果我们可以控制子域名的内容，也可以达到劫持主站 Cookie 的目的。</p>
+<h3 id="3"><a href="#3" class="headerlink" title="3."></a>3.</h3><p>如果有小伙伴知道其他利用场景的话，可以在文章下方留言讨论分享哈。</p>
+<h2 id="0x03-什么是-AWS-S3？"><a href="#0x03-什么是-AWS-S3？" class="headerlink" title="0x03 什么是 AWS S3？"></a>0x03 什么是 AWS S3？</h2><p>给大家介绍一下今天的主角 AWS S3。</p>
+<p>Amazon Simple Storage Service (Amazon S3) 是一种对象存储服务，提供行业领先的可扩展性、数据可用性、安全性和性能[5]。</p>
+<p>我们可以使用 Amazon S3 随时在 Web 上的任何位置保存和取回任何数量的数据。可以使用简单而直观的 Web 界面 AWS 管理控制台来完成这些任务[6]。</p>
+<p>AWS S3 提供静态网站托管的功能[7]。一个典型的业务场景就是，业务部门将一些静态 HTML/JS 资源存储在 S3 中，并启用静态网站托管功能。将其子域名解析至 S3 为其分配的静态网站 endpoint 上，供其用户访问。</p>
+<h2 id="0x04-在什么场景下，AWS-S3-会出现子域名接管漏洞？"><a href="#0x04-在什么场景下，AWS-S3-会出现子域名接管漏洞？" class="headerlink" title="0x04 在什么场景下，AWS S3 会出现子域名接管漏洞？"></a>0x04 在什么场景下，AWS S3 会出现子域名接管漏洞？</h2><p>如前文所述，由于业务需求的变更，这个 S3 静态网站不在使用，业务部门将 S3 Bucket 删除，而域名管理员未删掉域名 CNAME 解析记录，任意 AWS 客户均可创建一个同名的 S3 Bucket，并控制 S3 Bukcet 中的内容，AWS S3 子域名接管漏洞便产生了。</p>
+<h2 id="0x05-（攻）如何自动化挖掘子域名接管漏洞？"><a href="#0x05-（攻）如何自动化挖掘子域名接管漏洞？" class="headerlink" title="0x05 （攻）如何自动化挖掘子域名接管漏洞？"></a>0x05 （攻）如何自动化挖掘子域名接管漏洞？</h2><p>作为白帽子，我们现在已经知道了什么是子域名接管漏洞，以及子域名接管漏洞的危害，接下来我们要做的事情就是如何主动的发现这类子域名接管漏洞。</p>
+<p>如何判断一个子域名是否存在子域名接管漏洞，一共有两个步骤：</p>
+<ol>
+<li>通过 DNS 解析情况，判断其是否解析到了第三方服务上</li>
+<li>通过发起 HTTP（S）请求，判断响应内容是否包含指定特征（拿 AWS S3 举例来说，如果存在子域名接管漏洞的话，会返回 The specified bucket does not exist 特征。）</li>
+</ol>
+<p>还有一个场景，就是 NS 记录可控导致的子域名接管漏洞，详细的玩法可以参考 Kubernetes 的这个案例[8]。</p>
+<p>在这里我向大家推荐一个检测子域名接管漏洞的开源项目 subjack[2]（我的全自动化漏洞发现平台，用了它的一部分指纹。）</p>
+<p>安装和使用方法也比较简单，可以直接参考项目的 README。</p>
+<p>我们可以将该工具集成到自动化漏洞发现工作流（workflow）中，自动化的域名资产发现，定期的子域名接管漏洞检测，添加一些私有的漏洞识别规则，实时告警等，这个有点偏离了本文的主题了，后面有机会再聊。</p>
+<h2 id="0x06-（防）如何缓解子域名接管漏洞的危害？"><a href="#0x06-（防）如何缓解子域名接管漏洞的危害？" class="headerlink" title="0x06 （防）如何缓解子域名接管漏洞的危害？"></a>0x06 （防）如何缓解子域名接管漏洞的危害？</h2><p>其实作为防御型的团队来说，除了被动挨打之外，相比外部的攻击者，其实我们是有非常多的优势的：</p>
+<ol>
+<li>甲方团队拥有全量的资产信息，可以实时监控到资产的变化</li>
+<li>从信息安全意识、研发流程等各个阶段介入，规范化域名解析流程</li>
+<li>从架构上去优化，比如说解析到非核心业务子域名</li>
+</ol>
+<p>从源头上尽量避免漏洞产生，漏洞产生时第一时间检测到，以及漏洞即使被利用了，危害程度也会被大大降低，等多维度的覆盖到子域名接管漏洞的全生命周期。</p>
+<p>关于甲方视角的漏洞发现，@FEEI 师傅写了一篇很棒的文章，有兴趣的朋友可以去参考一下[9]。</p>
+<p>在缓解子域名接管漏洞方面，除了甲方团队要做很多事情之外，提供第三方服务厂商能做些什么吗？</p>
+<p>一些厂商，在遇到这类问题的时候，肯定第一时间就甩锅啦，说这个用户配置的问题，和他们产品本身的安全性无关。</p>
+<p>话虽然这样讲，但其实还是可以做一些事情来从源头上缓解这类问题的。</p>
+<p>作为云计算行业担当，AWS 在这一点就做的相当不错，AWS 给 CloudFront 加了一个功能[10][11]，验证子域名确实归属当前客户（当前客户拥有该域名的配置权限），来彻底解决了 CloudFront 的子域名接管漏洞，我们可以和 CloudFront 子域名接管漏洞说永别啦！</p>
+<h2 id="0x07-碎碎念"><a href="#0x07-碎碎念" class="headerlink" title="0x07 碎碎念"></a>0x07 碎碎念</h2><p>关于 AWS S3 子域名接管漏洞利用的一个坑点，S3 Bukcet 名字要和子域名完全相同的场景下才能利用子域名接管漏洞，如果名字不同是不能利用的。</p>
+<p>这是因为当我们访问 S3 的静态网站时，S3 会根据 Host 字段将我们的请求映射到对应的 Bucket，如果名称不同则无法映射到我们可控的 S3 Bucket 上，当然如果恰好映射到的那个 bucket 可控，那只能说我们运气爆棚 hhh</p>
+<p>有一篇信息安全顶会的论文，拿 wordpress 为例，刨析了一下网络空间内子域名接管漏洞的情况，有兴趣的读者也可以去了解一下。</p>
+<h2 id="0x08-一个彩蛋"><a href="#0x08-一个彩蛋" class="headerlink" title="0x08 一个彩蛋"></a>0x08 一个彩蛋</h2><p>我之前写过一个 S3OSINT，主要用于发现网络空间内可以未授权访问的对象存储服务，头两天看到一个老外也做了类似的事情（思路应该差不多，因为我发现他的数据量只比我多一点点），并且提供了有一定免费额度的商业化服务，有需要的小伙伴可以问我要。</p>
+<p><img src="https://files.mdnice.com/user/12658/2334f711-6cc7-4fed-a89f-9455fdd69b1f.png" alt=""></p>
+<h2 id="0x09-References"><a href="#0x09-References" class="headerlink" title="0x09 References"></a>0x09 References</h2><ol>
+<li>A GUIDE TO SUBDOMAIN TAKEOVERS - <a href="https://www.hackerone.com/blog/Guide-Subdomain-Takeovers">https://www.hackerone.com/blog/Guide-Subdomain-Takeovers</a></li>
+<li>haccer/subjack - <a href="https://github.com/haccer/subjack">https://github.com/haccer/subjack</a></li>
+<li>EdOverflow/can-i-take-over-xyz - <a href="https://github.com/EdOverflow/can-i-take-over-xyz">https://github.com/EdOverflow/can-i-take-over-xyz</a></li>
+<li>HackerOne Hacker Activity subdomain takeover - <a href="https://hackerone.com/hacktivity?querystring=subdomain%20takeover">https://hackerone.com/hacktivity?querystring=subdomain%20takeover</a></li>
+<li>Amazon S3 - <a href="https://aws.amazon.com/cn/s3/">https://aws.amazon.com/cn/s3/</a></li>
+<li>Amazon S3 入门 - <a href="https://aws.amazon.com/cn/s3/getting-started/">https://aws.amazon.com/cn/s3/getting-started/</a></li>
+<li>Hosting a static website using Amazon S3 - <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html">https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html</a></li>
+<li>Route53 Subdomain Takeover on test-cncf-aws.canary.k8s.io - <a href="https://hackerone.com/reports/794382">https://hackerone.com/reports/794382</a></li>
+<li><a href="https://mp.weixin.qq.com/s/eBPp4eyaGs827POFTesqOA">基于甲方视角的漏洞发现</a></li>
+<li>cloudfront takeover is not possible anymore - <a href="https://github.com/EdOverflow/can-i-take-over-xyz/issues/29">https://github.com/EdOverflow/can-i-take-over-xyz/issues/29</a>) </li>
+<li>Continually Enhancing Domain Security on Amazon CloudFront - <a href="https://aws.amazon.com/cn/blogs/networking-and-content-delivery/continually-enhancing-domain-security-on-amazon-cloudfront/">https://aws.amazon.com/cn/blogs/networking-and-content-delivery/continually-enhancing-domain-security-on-amazon-cloudfront/</a></li>
+</ol>
+</div></article></div></main><footer><div class="paginator"><a href="/2021/09/18/Write-test-files-for-CodeQL-custom-rules/" class="prev">PREV</a><a href="/2021/03/29/HTTP-2-Header-Field-Re-used-Attack-Trick/" class="next">NEXT</a></div><div class="copyright"><p>© 2008 - 2024 <a href="https://tonghuaroot.com">TonghuaRoot</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>

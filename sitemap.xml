@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  <url>
+    <loc>https://tonghuaroot.com/about/index.html</loc>
+    
+    <lastmod>2024-12-04T13:40:02.232Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/friends/index.html</loc>
+    
+    <lastmod>2024-12-04T13:39:12.175Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2021/12/18/Using-CloudFront-Relay-Cobalt-Strike-Traffic/</loc>
+    
+    <lastmod>2021-12-18T06:37:56.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2021/12/18/Static-Program-Analysis-Intruction/</loc>
+    
+    <lastmod>2021-12-18T06:36:18.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2021/12/18/Lessons-from-Building-Static-Analysis-Tools-at-Google-Notes/</loc>
+    
+    <lastmod>2021-12-18T06:32:30.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2021/09/18/Write-test-files-for-CodeQL-custom-rules/</loc>
+    
+    <lastmod>2021-09-18T10:07:02.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2021/04/10/AWS-S3-subdomain-takeover/</loc>
+    
+    <lastmod>2021-05-07T12:00:00.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2021/03/29/HTTP-2-Header-Field-Re-used-Attack-Trick/</loc>
+    
+    <lastmod>2021-05-07T11:58:00.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2020/11/25/This-is-a-test-page-for-testing-Github-Action/</loc>
+    
+    <lastmod>2020-11-26T12:46:38.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2020/11/16/Smogcloud-AWS-external-network-asset-discovery-platform/</loc>
+    
+    <lastmod>2020-11-16T12:46:20.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2020/09/14/write-a-simple-HTTPS-server-use-Go/</loc>
+    
+    <lastmod>2020-09-14T10:28:42.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2020/06/29/Hack-The-Box-Postman-Writeup-Linux/</loc>
+    
+    <lastmod>2020-06-29T06:41:42.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2020/05/22/Use-CloudWatch-Event-to-monitor-ElasticSearch-events/</loc>
+    
+    <lastmod>2020-05-27T08:07:44.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2020/04/25/Cobalt-Strike-Aggressor-Script-IM-Alert/</loc>
+    
+    <lastmod>2020-04-25T08:48:54.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2020/03/02/how-to-use-hashcat-to-crack-ntlmv2-hash/</loc>
+    
+    <lastmod>2020-03-02T15:43:22.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2020/02/28/Zero-trust-in-my-eyes/</loc>
+    
+    <lastmod>2020-02-28T07:29:46.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2020/01/01/Golang-webshell/</loc>
+    
+    <lastmod>2020-01-01T14:52:54.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2019/11/25/AWS-IAM-MFA-force-console-no-use-MFA-in-CLI/</loc>
+    
+    <lastmod>2019-11-25T08:50:22.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2019/11/23/Specify-IP-Use-AWS/</loc>
+    
+    <lastmod>2019-11-23T15:56:00.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2019/11/23/S3-pre-signed-url-and-KMS/</loc>
+    
+    <lastmod>2019-11-23T15:05:22.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2019/11/21/S3-Bucket-Policy-Only-One-User/</loc>
+    
+    <lastmod>2019-11-21T13:52:58.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2019/11/21/IAM-AssumeRole-and-TrustRelationship/</loc>
+    
+    <lastmod>2019-11-21T13:00:26.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2019/11/19/AWS-Lambda-Node-js-reverse-shell/</loc>
+    
+    <lastmod>2019-11-19T13:30:08.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2019/11/19/AWS-ECS-Fargate/</loc>
+    
+    <lastmod>2019-11-19T12:18:42.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2019/11/17/how-to-install-S3FS/</loc>
+    
+    <lastmod>2019-11-17T07:16:58.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2019/11/15/AWS-EBS-UUID-EC2-Change-Instance-Type/</loc>
+    
+    <lastmod>2019-11-15T05:49:42.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2019/11/13/AWS-S3-Versioning/</loc>
+    
+    <lastmod>2019-11-13T11:32:36.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2019/11/08/AWS-S3-Multipart-Upload/</loc>
+    
+    <lastmod>2019-11-08T13:39:52.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2019/11/01/AWS-ALB-Access-log-And-KMS/</loc>
+    
+    <lastmod>2019-11-01T09:01:14.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2019/11/01/about-aws-nlb-interesting-qa/</loc>
+    
+    <lastmod>2019-11-01T04:19:40.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2019/10/25/AWS-KMS-Encryption-AMI-Share-to-B-account/</loc>
+    
+    <lastmod>2019-10-25T08:59:28.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2019/10/14/OSCP-Vulnhub-Kioptrix-Level-2-Writeup/</loc>
+    
+    <lastmod>2019-10-14T04:19:50.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2019/10/13/OSCP-Vulnhub-Kioptrix-Level-1-Writeup/</loc>
+    
+    <lastmod>2019-10-13T12:35:26.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2019/10/07/My-security-technology-stack/</loc>
+    
+    <lastmod>2019-10-10T09:46:10.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2019/10/09/ADFS-SAML-Integrated-AWS-China/</loc>
+    
+    <lastmod>2019-10-09T05:37:24.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2019/06/19/OSCP-Note-Common-use-of-Netcat-nc-and-Ncat/</loc>
+    
+    <lastmod>2019-06-19T08:34:10.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2019/05/29/A-command-similar-to-wget-in-Windows-Invoke-WebRequest/</loc>
+    
+    <lastmod>2019-05-29T09:15:20.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2017/12/25/Flask-debug-mode-PIN-code-generation-mechanism-security-research-notes/</loc>
+    
+    <lastmod>2019-05-29T09:09:56.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2019/05/22/How-Winodws-Escalation-Privilege-from-administrator-privilege-to-system-privilege/</loc>
+    
+    <lastmod>2019-05-29T08:43:44.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2019/05/28/Use-AWS-SSM-Systems-Manager-execute-remote-script-file-at-EC2-instance/</loc>
+    
+    <lastmod>2019-05-29T08:43:04.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2019/05/23/AWS-VPC-DHCP-Options-Set-change-Effective-immediately/</loc>
+    
+    <lastmod>2019-05-29T02:20:12.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2018/03/02/Enterprise-Cyber-security-build-of-Windows-lateral-movement-attacks-detection/</loc>
+    
+    <lastmod>2019-05-28T11:02:04.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2019/05/23/How-do-I-set-the-S3-bucket-policy-so-that-it-can-only-be-accessed-by-the-specified-IP/</loc>
+    
+    <lastmod>2019-05-23T10:35:02.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2016/10/22/An-example-of-network-security-problems-in-the-IoT-era/</loc>
+    
+    <lastmod>2019-05-21T17:36:02.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://tonghuaroot.com/2018/11/06/Gogs-RCE-Vulnerability-Analysis/</loc>
+    
+    <lastmod>2019-05-21T17:24:58.000Z</lastmod>
+    
+  </url>
+  
+</urlset>

@@ -1,0 +1,49 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> ECS Fargate 初体验 · TonghuaRoot's BloG. - Cyber security enthusiast, not Hacker.</title><meta name="description" content="ECS Fargate 初体验 - TonghuaRoot"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://tonghuaroot.com/atom.xml" title="TonghuaRoot's BloG. - Cyber security enthusiast, not Hacker."><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="TonghuaRoot's BloG. - Cyber security enthusiast, not Hacker." type="application/atom+xml">
+</head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="/about" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="https://twitter.com/tonghuaroot" target="_blank" class="nav-list-link">TWITTE</a></li><li class="nav-list-item"><a href="https://github.com/tonghuaroot" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/friends" target="_self" class="nav-list-link">FRS</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">ECS Fargate 初体验</h1><div class="post-info">Nov 19, 2019</div><div class="post-content"><h2 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h2><p>对标K8S，ECS就是AWS上做docker集群管理用的。ECS Fargate就是托管的，我不需要登上实例管理了。这里搞个简单的demo测试一下。</p>
+<h2 id="0x01-准备工作"><a href="#0x01-准备工作" class="headerlink" title="0x01 准备工作"></a>0x01 准备工作</h2><p>用的cn-northwest-1的ECS。</p>
+<ol>
+<li>先创建一个集群<br><img src="FBBDAB5995CD4E82B94CF0800ABBE4A2" alt="image"></li>
+</ol>
+<p><img src="44A011E1C08B456596D14D04FF699C4F" alt="image"></p>
+<p><img src="2D94472F16AE4289A6E68D70E32F62F6" alt="image"></p>
+<p>稍等片刻，集群就创建完了</p>
+<p><img src="4FF4DF34DB7745AFBB57A9A6842559CC" alt="image"></p>
+<ol start="2">
+<li>然后再搞个ECR仓库用来装docker镜像</li>
+</ol>
+<p><img src="7108A100DB114454813C6E01527EB30F" alt="image"></p>
+<p><img src="C5C663FA6ED646BE94CD71E4A663EE9E" alt="image"></p>
+<ol start="3">
+<li>仓库创建完了之后，回到EC2实例上，把dockerhub上的镜像拖回来搞到ECR上<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@ip-10-0-0-64 ec2-user]# docker pull nginx</span><br><span class="line">Using default tag: latest</span><br><span class="line">latest: Pulling from library/nginx</span><br><span class="line">Digest: sha256:922c815aa4df050d4df476e92daed4231f466acc8ee90e0e774951b0fd7195a4</span><br><span class="line">Status: Image is up to date for nginx:latest</span><br><span class="line">[root@ip-10-0-0-64 ec2-user]#</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p><img src="CBF341A5AF9143D09D59175B527E07EB" alt="image"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[root@ip-10-0-0-64 ec2-user]# $(aws ecr get-login --no-include-email --region cn-northwest-1)</span><br><span class="line">WARNING! Using --password via the CLI is insecure. Use --password-stdin.</span><br><span class="line">WARNING! Your password will be stored unencrypted in /root/.docker/config.json.</span><br><span class="line">Configure a credential helper to remove this warning. See</span><br><span class="line">https://docs.docker.com/engine/reference/commandline/login/#credentials-store</span><br><span class="line"></span><br><span class="line">Login Succeeded</span><br><span class="line">[root@ip-10-0-0-64 ec2-user]# docker tag nginx:latest 297692170000.dkr.ecr.cn-northwest-1.amazonaws.com.cn/tonghua-ecr-repo:latest</span><br><span class="line">[root@ip-10-0-0-64 ec2-user]# docker push 297692170000.dkr.ecr.cn-northwest-1.amazonaws.com.cn/tonghua-ecr-repo:latest</span><br><span class="line">The push refers to repository [297692170000.dkr.ecr.cn-northwest-1.amazonaws.com.cn/tonghua-ecr-repo]</span><br><span class="line">a89b8f05da3a: Pushed</span><br><span class="line">6eaad811af02: Pushed</span><br><span class="line">b67d19e65ef6: Pushed</span><br><span class="line">latest: digest: sha256:f56b43e9913cef097f246d65119df4eda1d61670f7f2ab720831a01f66f6ff9c size: 948</span><br><span class="line">[root@ip-10-0-0-64 ec2-user]#</span><br></pre></td></tr></table></figure>
+<p><img src="E361F462C2C44FB6A0D0D209F84A0850" alt="image"></p>
+<p>可以看到已经传成功了：</p>
+<p><img src="50083D3C162C4C4887BA50D346D69A19" alt="image"></p>
+<h2 id="0x02-创建服务"><a href="#0x02-创建服务" class="headerlink" title="0x02 创建服务"></a>0x02 创建服务</h2><p>前面准备工作就算做完了，这头我就继续拿着传上来的镜像部署服务了。</p>
+<ol>
+<li>创建任务定义<br><img src="4CA8FEC7E4694CC2ABB688E8C8C95858" alt="image"></li>
+</ol>
+<p><img src="9097E8E63E7D468992B7065DD5D20DFC" alt="image"></p>
+<p><img src="B987529C49B6466BA7CEEA5CA96D7EC9" alt="image"></p>
+<p>别的都用默认值，然后再增加下容器。</p>
+<p><img src="4035863F7104405A924EAA61BEBC168E" alt="image"></p>
+<p>可以看到，任务定义已经创建成功了，</p>
+<p><img src="C81826E7AD0641A3964033BAB757DDFC" alt="image"></p>
+<ol start="2">
+<li>然后进到一个集群里头创建一个服务试试：</li>
+</ol>
+<p><img src="68A003A152294183A3C7AE3444CD6C76" alt="image"></p>
+<p><img src="E85C72E4B637485895E27426B2A155EF" alt="image"></p>
+<p>emm，刚才创建的任务定义忘了映射端口了，重新创建一个把docker容器的80端口映射出来。</p>
+<p>然后还需要创建一个ALB，部署在ECS前端。</p>
+<p><img src="D7DD9C6E31E24064830987AC0CCBE4BE" alt="image"></p>
+<p>继续下一步：</p>
+<p><img src="5889746F488442B895AFB5F36A698674" alt="image"></p>
+<p>然后等着启动就行了：<br><img src="E3A420F6B5FE41878A61CA8271951C49" alt="image"></p>
+<p>可以看到，都成了。<br><img src="F102DC68F50D46F59AF5FF9B4693B465" alt="image"></p>
+<h2 id="0x03-troubleshooting"><a href="#0x03-troubleshooting" class="headerlink" title="0x03 troubleshooting"></a>0x03 troubleshooting</h2><p>一般都是看【服务】的【事件】，【任务】的【log】，具体情况具体看吧。<br><img src="B2FAC9C250A74D9C89A3F92ECBBEC643" alt="image"></p>
+<h2 id="0x04-后记"><a href="#0x04-后记" class="headerlink" title="0x04 后记"></a>0x04 后记</h2><p>简单记录下，文档看的云里雾里，还是动手一把梭来的快一点。</p>
+</div></article></div></main><footer><div class="paginator"><a href="/2019/11/19/AWS-Lambda-Node-js-reverse-shell/" class="prev">PREV</a><a href="/2019/11/17/how-to-install-S3FS/" class="next">NEXT</a></div><div class="copyright"><p>© 2008 - 2024 <a href="https://tonghuaroot.com">TonghuaRoot</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script></body></html>
